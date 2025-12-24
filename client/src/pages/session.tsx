@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Webcam from "react-webcam";
-import { Mic, MicOff, Video, VideoOff, Play, Square, Loader2, Sparkles, Settings2 } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, Play, Square, Loader2, Sparkles, Settings2, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +10,8 @@ import InterviewTimer from "@/components/interview-timer";
 import DifficultySelector, { Difficulty, QuestionType } from "@/components/difficulty-selector";
 import ConfidenceScore from "@/components/confidence-score";
 import AnswerStructureAnalyzer from "@/components/answer-structure-analyzer";
+import InterviewReplay from "@/components/interview-replay";
+import RealTimeFeedback from "@/components/real-time-feedback";
 
 const QUESTIONS = {
   easy: {
@@ -80,6 +82,7 @@ export default function Session() {
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [questionType, setQuestionType] = useState<QuestionType>("behavioral");
   const [showSettings, setShowSettings] = useState(true);
+  const [showReplay, setShowReplay] = useState(false);
   const [feedback, setFeedback] = useState<{metric: string, status: 'good' | 'warning' | 'bad', message: string} | null>(null);
 
   // Get questions based on difficulty and type
@@ -108,8 +111,15 @@ export default function Session() {
     setShowSettings(false);
   };
 
+  const handleEndSession = () => {
+    setIsActive(false);
+    setShowReplay(true);
+  };
+
   return (
     <div className="h-[calc(100vh-2rem)] p-6 gap-6 flex flex-col max-w-[1600px] mx-auto overflow-hidden">
+      <RealTimeFeedback isActive={isActive} />
+      <InterviewReplay isOpen={showReplay} onClose={() => setShowReplay(false)} />
       
       {/* Top Bar - Timer & Controls */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
@@ -212,7 +222,7 @@ export default function Session() {
                 variant={isActive ? "destructive" : "default"}
                 size="lg"
                 className={`rounded-full px-8 font-semibold shadow-[0_0_20px_rgba(0,240,255,0.3)] ${isActive ? 'bg-red-500 hover:bg-red-600 shadow-red-500/30' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
-                onClick={() => isActive ? setIsActive(false) : handleStartSession()}
+                onClick={() => isActive ? handleEndSession() : handleStartSession()}
                 data-testid="button-session-control"
               >
                 {isActive ? (
@@ -302,6 +312,18 @@ export default function Session() {
                   <p className="text-xs mt-2 text-left">{pressureMode ? "Realistic interview conditions" : "Enable for challenging practice"}</p>
                 </button>
               </Card>
+
+              {/* Replay Session */}
+              {!isActive && (
+                <Button
+                  onClick={() => setShowReplay(true)}
+                  className="w-full bg-gradient-to-r from-secondary to-primary hover:opacity-90 text-white font-semibold"
+                  data-testid="button-replay-session"
+                >
+                  <RotateCw className="w-4 h-4 mr-2" />
+                  Review Session Replay
+                </Button>
+              )}
             </TabsContent>
 
             {/* Analytics Panel */}
