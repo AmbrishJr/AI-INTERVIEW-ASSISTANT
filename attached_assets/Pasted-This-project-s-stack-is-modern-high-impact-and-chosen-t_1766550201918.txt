@@ -1,0 +1,159 @@
+This project’s stack is modern, high-impact, and chosen to minimize latency while still showing off AI + CV + full‑stack skills; there are also many possible substitutions depending on your preferences and goals.
+
+
+Core stack in this project
+Frontend: Next.js (React)
+
+Used for the UI, routing, and integrating webcam/mic access in the browser.
+
+
+Next.js adds server‑side rendering, API routes, and performance optimizations on top of React, which is good for a production‑style SaaS dashboard.
+
+
+Edge AI: MediaPipe JS (Face Mesh / Iris)
+
+MediaPipe’s Face Mesh and Iris solutions run directly in the browser, giving you real‑time face and eye‑tracking without sending video frames to the server.
+
+
+This client‑side inference approach, often compiled to WebAssembly, cuts GPU/server costs and avoids network latency for gaze detection.
+
+
+Speech handling: Web Speech API
+
+The browser’s Web Speech API provides speech‑to‑text (SpeechRecognition) so you can convert live audio from the mic into text without uploading audio files.
+
+
+It is free and works with plain JavaScript, which keeps your frontend simpler and the UX very responsive.
+
+
+Backend: FastAPI (Python)
+
+FastAPI is a high‑performance Python framework with async support, automatic validation via Pydantic models, and built‑in OpenAPI docs.
+
+
+It is well‑suited for ML/LLM “orchestration” APIs: receiving user answers, calling Groq’s Llama‑3 models, and writing results to the database.
+
+
+LLM / Inference: Groq Cloud (Llama‑3)
+
+Groq Cloud serves Llama‑3 models on specialized LPUs, achieving very high token throughput and low latency per request.
+
+
+This makes real‑time grading and conversation feel instant while using a free or low‑cost developer tier.
+
+
+Database: PostgreSQL via Supabase
+
+Supabase provides a managed Postgres database plus authentication, row‑level security, and REST/GraphQL APIs.
+
+
+It is used to store user profiles, questions, model answers/keywords, and historical scores so you can show progress and analytics over time.
+
+Visualization: Recharts
+
+Recharts is a React charting library based on D3 that makes it easy to draw responsive line charts and bar charts for metrics like eye‑contact confidence and scores.
+
+
+It integrates cleanly with Next.js components for live updating dashboards.
+
+Alternative frontend stacks
+React (CRA/Vite) + React Router
+
+Simpler than Next.js if you do not need server‑side rendering or built‑in API routes; you handle routing, bundling, and optimizations yourself.
+
+
+Good for a purely client‑side SPA, but you lose some of Next.js’s performance and full‑stack features.
+
+
+Vue (Nuxt)
+
+Nuxt is the Vue equivalent of Next.js, with file‑based routing, SSR, and good DX.
+
+
+If you prefer Vue’s reactivity model, you can still integrate MediaPipe and Web Speech API in Vue components.
+
+SvelteKit
+
+SvelteKit offers a compact syntax and excellent performance, and can also host client‑side webcam/speech logic.
+
+Useful if you want a smaller bundle size and a different component model compared to React.
+
+Alternative backend stacks
+Node.js + Express / NestJS
+
+Express is a minimal framework; NestJS adds structure, decorators, and TypeScript, which some teams prefer for large APIs.
+
+
+Both integrate well with JavaScript‑heavy teams and can call Groq or any other LLM provider via HTTP.
+
+Django / Flask (Python)
+
+Django gives a “batteries‑included” experience with ORM, admin, and auth, which is useful if you want more than just a thin API.
+
+
+Flask is lighter than Django but lacks FastAPI’s native async performance and automatic schema docs.
+
+Go (Gin / Fiber)
+
+Go frameworks like Gin/Fiber are very fast and statically typed, good for high‑throughput APIs.
+
+You would still call the same LLM and DB services, but with Go’s tooling and concurrency model.
+
+Alternative AI / inference options
+OpenAI / Anthropic APIs
+
+Provide powerful general‑purpose models with strong reasoning, but usually higher latency and cost than Groq’s Llama‑3 deployment.
+
+
+Better if you need frontier‑model quality over ultra‑low latency.
+
+Self‑hosted LLMs (vLLM, TGI)
+
+Running Llama or Mistral locally (on GPU/VPS) gives full control but requires infra and more MLOps work.
+
+This is less suitable for students without GPUs, which is why Groq’s managed service is attractive.
+
+
+Specialized eval models (e.g., OpenAI o3‑mini / eval tools)
+
+You could use separate models just for grading and explanation quality metrics.
+
+This increases complexity but may give more consistent scoring.
+
+Alternative data and auth layers
+Prisma + PlanetScale / Neon (Postgres/MySQL)
+
+Prisma offers a type‑safe ORM with schema migrations; PlanetScale and Neon are popular serverless database providers.
+
+This is common with TypeScript backends (e.g., NestJS or a Next.js API backend).
+
+
+Firebase / Firestore
+
+Easier realtime sync and built‑in auth; structured as a NoSQL store rather than relational tables.
+
+Good if you want quick prototypes and live dashboards without writing much backend code.
+
+MongoDB Atlas
+
+A managed document database suitable for flexible schemas; often paired with Node.js and Mongoose.
+
+Less ideal if you want strict relational modeling for questions, answers, and scores.
+
+Alternative browser speech/CV options
+Third‑party speech APIs (AssemblyAI, Google Cloud Speech)
+
+Offer more accurate transcription and language support than the basic Web Speech API, but require sending audio to a remote service and managing API keys.
+
+
+This adds latency and cost, so the built‑in Web Speech API is better for low‑friction student projects.
+
+
+TensorFlow.js or ONNX Runtime Web for CV
+
+You can load generic face/eye‑tracking models and run them in the browser similar to MediaPipe.
+
+
+This is more flexible but requires model selection, conversion, and more performance tuning.
+
+If you describe your own strengths (Python vs JS, infra comfort, etc.), a custom stack recommendation can be made that matches what you can realistically build in 4–6 weeks make this into a simpler prompt based on frontnend
