@@ -45,16 +45,16 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/session">
+              <Link href="/login">
                 <Button size="lg" className="h-14 px-8 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all hover:scale-105">
-                  Start Simulation <ArrowRight className="ml-2 w-5 h-5" />
+                  Get Started <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="/dashboard">
+              <a href="#features">
                 <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-full backdrop-blur-sm">
-                  View Analytics
+                  Learn More
                 </Button>
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
