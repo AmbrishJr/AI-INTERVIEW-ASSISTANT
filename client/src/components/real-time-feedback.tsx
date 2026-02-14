@@ -17,12 +17,8 @@ interface RealTimeFeedbackProps {
 const FEEDBACK_QUEUE = [
   { type: "warning", icon: "volume", message: "Slow down, you're speaking too fast" },
   { type: "suggestion", icon: "eye", message: "Look at the camera more" },
-  { type: "warning", icon: "alert", message: "Avoid filler words like 'um' and 'like'" },
   { type: "positive", icon: "zap", message: "Great eye contact!" },
-  { type: "suggestion", icon: "lightbulb", message: "Take a pause to gather your thoughts" },
-  { type: "warning", icon: "alert", message: "Speaking too quietly, project your voice" },
-  { type: "positive", icon: "zap", message: "Excellent structure to your answer" },
-  { type: "suggestion", icon: "lightbulb", message: "Use more concrete examples" },
+  { type: "warning", icon: "alert", message: "Avoid filler words like 'um' and 'like'" },
 ];
 
 const iconMap = {
@@ -42,7 +38,7 @@ export default function RealTimeFeedback({ isActive }: RealTimeFeedbackProps) {
       return;
     }
 
-    // Randomly queue feedback messages
+    // Simulate real-time feedback generation
     const interval = setInterval(() => {
       const randomFeedback = FEEDBACK_QUEUE[Math.floor(Math.random() * FEEDBACK_QUEUE.length)];
       const newMessage: FeedbackMessage = {
@@ -52,9 +48,8 @@ export default function RealTimeFeedback({ isActive }: RealTimeFeedbackProps) {
         message: randomFeedback.message,
         duration: 4000,
       };
-
       setFeedbackStack((prev) => [...prev.slice(-2), newMessage]); // Keep max 3 messages
-
+      
       // Auto-remove after duration
       setTimeout(() => {
         setFeedbackStack((prev) => prev.filter((m) => m.id !== newMessage.id));
@@ -65,7 +60,7 @@ export default function RealTimeFeedback({ isActive }: RealTimeFeedbackProps) {
   }, [isActive]);
 
   return (
-    <div className="fixed bottom-20 left-6 z-40 space-y-3 pointer-events-none max-w-sm">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform z-30 space-y-3 pointer-events-none max-w-sm">
       <AnimatePresence mode="popLayout">
         {feedbackStack.map((feedback) => {
           const Icon = iconMap[feedback.icon];

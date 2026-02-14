@@ -35,8 +35,9 @@ export default function AIChatbot() {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -49,20 +50,48 @@ export default function AIChatbot() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userInput = input;
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Send message to AI backend
+      const response = await fetch('http://localhost:3000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userInput }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+
+      // Add AI response
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        text: SAMPLE_RESPONSES[Math.floor(Math.random() * SAMPLE_RESPONSES.length)],
+        text: data.response,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('AI Chat error:', error);
+      
+      // Fallback to sample response on error
+      const fallbackMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        text: "I'm having trouble connecting right now. Here's a quick tip: Practice common interview questions and focus on the STAR method (Situation, Task, Action, Result) for behavioral questions!",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, fallbackMessage]);
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   return (
@@ -70,16 +99,38 @@ export default function AIChatbot() {
       {/* Floating Button */}
       <AnimatePresence>
         {!isOpen && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center justify-center hover:scale-110 transition-transform duration-300 group"
-            data-testid="button-chatbot"
-          >
-            <MessageCircle className="w-6 h-6 text-white group-hover:animate-pulse" />
-          </motion.button>
+          <div className="fixed bottom-6 right-6 z-40 flex items-end gap-2">
+            {/* Tooltip */}
+            <AnimatePresence>
+              {showTooltip && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                  className="bg-card/95 backdrop-blur-md border border-primary/20 rounded-lg px-3 py-2 shadow-lg max-w-xs"
+                >
+                  <p className="text-sm text-white font-medium">
+                    Hi! I'm your AI chatbot. I'm here to help you - ask me any questions!
+                  </p>
+                  <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-8 border-l-primary/20 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {/* Chatbot Button */}
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              onClick={() => setIsOpen(true)}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+              className="w-14 h-14 rounded-full bg-gradient-to-r from-primary to-secondary shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center justify-center hover:scale-110 transition-transform duration-300 group"
+              data-testid="button-chatbot"
+            >
+              <MessageCircle className="w-6 h-6 text-white group-hover:animate-pulse" />
+            </motion.button>
+          </div>
         )}
       </AnimatePresence>
 

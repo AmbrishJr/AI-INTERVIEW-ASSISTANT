@@ -11,67 +11,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import InterviewTimer from "@/components/interview-timer";
-import DifficultySelector, { Difficulty, QuestionType } from "@/components/difficulty-selector";
+import DifficultySelector, { Difficulty as SelectorDifficulty, QuestionType as SelectorQuestionType } from "@/components/difficulty-selector";
 import ConfidenceScore from "@/components/confidence-score";
 import AnswerStructureAnalyzer from "@/components/answer-structure-analyzer";
 import InterviewReplay from "@/components/interview-replay";
 import RealTimeFeedback from "@/components/real-time-feedback";
+import PracticeSetup from "@/components/practice-setup";
 import { useLocation } from "wouter";
 import { useAuthState } from "@/contexts/AuthStateContext";
-
-const QUESTIONS = {
-  easy: {
-    behavioral: [
-      "Tell me about yourself and your background.",
-      "Describe a time you worked in a team.",
-      "What are your strengths?"
-    ],
-    technical: [
-      "Explain what an API is.",
-      "What is the difference between SQL and NoSQL?",
-      "How do you debug code?"
-    ],
-    hr: [
-      "Why do you want to work here?",
-      "Where do you see yourself in 5 years?",
-      "What motivates you?"
-    ]
-  },
-  medium: {
-    behavioral: [
-      "Tell me about a time you overcame a major challenge.",
-      "Describe a situation where you had to deal with conflicting priorities.",
-      "Give an example of when you showed leadership."
-    ],
-    technical: [
-      "Design a system to handle high traffic.",
-      "Explain the difference between REST and GraphQL.",
-      "How would you optimize a slow database query?"
-    ],
-    hr: [
-      "How do you handle feedback?",
-      "Describe your ideal work environment.",
-      "Tell me about a time you failed."
-    ]
-  },
-  hard: {
-    behavioral: [
-      "Tell me about your most complex project and your role in it.",
-      "Describe a time you had to make a difficult decision with incomplete information.",
-      "Give an example of when you had to adapt your approach mid-project."
-    ],
-    technical: [
-      "Design a distributed system architecture for a social media platform.",
-      "How would you build a real-time collaborative editor?",
-      "Explain how you would scale a microservices architecture."
-    ],
-    hr: [
-      "How do you balance innovation with shipping products?",
-      "Tell me about a time you changed someone's mind.",
-      "Describe your approach to mentoring junior developers."
-    ]
-  }
-};
+import { generateQuestions, type QuestionType, type Difficulty } from "@/data/complete-questions-data";
 
 const MOCK_TRANSCRIPT = [
   { role: "ai", text: "Hello! I'm your AI interviewer today. Let's start with the question on your screen." },
@@ -90,6 +38,13 @@ type Session = {
   duration: number;
   date: string;
   notes: string;
+};
+
+type SetupData = {
+  selectedDomain: string;
+  experienceLevel: string;
+  difficulty: string;
+  questionType: string;
 };
 
 // Confirmation Modal Component
@@ -129,7 +84,7 @@ const ConfirmationModal = ({
   );
 };
 
-export default function Session() {
+export default function Practice() {
   const [, setLocation] = useLocation();
   const { isLoggedIn } = useAuthState();
   
@@ -144,7 +99,40 @@ export default function Session() {
   if (!isLoggedIn) {
     return null;
   }
+
+  // State management for setup flow
+  const [startInterview, setStartInterview] = useState(false);
+  const [setupData, setSetupData] = useState<SetupData | null>(null);
+  const [generatedQuestions, setGeneratedQuestions] = useState<string[]>([]);
   
+  // Handle setup submission
+  const handleSetupSubmit = (data: SetupData) => {
+    setSetupData(data);
+    
+    // Generate questions based on user selections
+    const questions = generateQuestions(
+      data.selectedDomain,
+      data.questionType as QuestionType,
+      data.difficulty as Difficulty,
+      20 // Generate 20 questions
+    );
+    
+    setGeneratedQuestions(questions);
+    setStartInterview(true);
+  };
+
+  // Reset to setup
+  const handleBackToSetup = () => {
+    setStartInterview(false);
+    setSetupData(null);
+    setGeneratedQuestions([]);
+    setCurrentQuestionIndex(0);
+    setIsActive(false);
+    setIsPaused(false);
+    setElapsedTime(0);
+  };
+
+  // Original session state
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [micOn, setMicOn] = useState(true);
@@ -177,6 +165,17 @@ export default function Session() {
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const transcriptEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Question state
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [transcript, setTranscript] = useState(MOCK_TRANSCRIPT);
+  const [pressureMode, setPressureMode] = useState(false);
+  const [showSettings, setShowSettings] = useState(true);
+  const [showReplay, setShowReplay] = useState(false);
+  const [feedback, setFeedback] = useState<{metric: string, status: 'good' | 'warning' | 'bad', message: string} | null>(null);
+
+  // Get current question
+  const currentQuestion = generatedQuestions[currentQuestionIndex] || "Loading question...";
 
   // Format time in HH:MM:SS
   const formatTime = (seconds: number): string => {
@@ -253,12 +252,16 @@ export default function Session() {
   }, []);
 
   const handleBack = useCallback(() => {
-    if (isActive || notes.trim() !== '') {
-      setShowConfirmEnd(true);
+    if (startInterview) {
+      if (isActive || notes.trim() !== '') {
+        setShowConfirmEnd(true);
+      } else {
+        handleBackToSetup();
+      }
     } else {
       setLocation("/");
     }
-  }, [isActive, notes, setLocation]);
+  }, [startInterview, isActive, notes, setLocation]);
 
   const handleToggleCamera = useCallback(() => {
     setCamOn((prev) => {
@@ -272,12 +275,35 @@ export default function Session() {
     });
   }, []);
 
-  // Load saved data on mount
+  // Next question
+  const handleNextQuestion = useCallback(() => {
+    if (currentQuestionIndex < generatedQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  }, [currentQuestionIndex, generatedQuestions.length]);
+
+  // Previous question
+  const handlePreviousQuestion = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  }, [currentQuestionIndex]);
+
+  // Load saved data on mount and reset interview state
   useEffect(() => {
     const savedNotes = localStorage.getItem('sessionNotes');
     const savedSessions = localStorage.getItem('sessionHistory');
     if (savedNotes) setNotes(savedNotes);
     if (savedSessions) setSessions(JSON.parse(savedSessions));
+    
+    // Reset interview state to ensure setup page shows first
+    setStartInterview(false);
+    setSetupData(null);
+    setGeneratedQuestions([]);
+    setCurrentQuestionIndex(0);
+    setIsActive(false);
+    setIsPaused(false);
+    setElapsedTime(0);
   }, []);
 
   // Handle keyboard shortcuts
@@ -356,18 +382,6 @@ export default function Session() {
       setIsFullscreen(false);
     }
   };
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [transcript, setTranscript] = useState(MOCK_TRANSCRIPT);
-  const [pressureMode, setPressureMode] = useState(false);
-  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
-  const [questionType, setQuestionType] = useState<QuestionType>("behavioral");
-  const [showSettings, setShowSettings] = useState(true);
-  const [showReplay, setShowReplay] = useState(false);
-  const [feedback, setFeedback] = useState<{metric: string, status: 'good' | 'warning' | 'bad', message: string} | null>(null);
-
-  // Get questions based on difficulty and type
-  const questions = QUESTIONS[difficulty][questionType];
-  const currentQuestion = questions[currentQuestionIndex];
 
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -400,8 +414,12 @@ export default function Session() {
     }
   }, [isActive]);
 
-  // Session control functions are defined in the useCallback section above
+  // Show setup page if interview hasn't started
+  if (!startInterview) {
+    return <PracticeSetup onSubmit={handleSetupSubmit} />;
+  }
 
+  // Show camera interview page
   return (
     <div className="h-[calc(100vh-2rem)] p-6 gap-6 flex flex-col max-w-[1600px] mx-auto overflow-y-auto">
       <RealTimeFeedback isActive={isActive} />
@@ -419,7 +437,7 @@ export default function Session() {
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-muted-foreground text-sm font-mono uppercase tracking-wider">
-                    {difficulty.toUpperCase()} • {questionType.toUpperCase()}
+                    {setupData?.selectedDomain} • {setupData?.questionType} • {setupData?.difficulty}
                   </h2>
                   <div className="flex items-center mt-1 space-x-2">
                     <div className="flex items-center text-sm text-primary bg-primary/10 px-2 py-0.5 rounded">
@@ -454,18 +472,29 @@ export default function Session() {
                     className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg transition-all flex items-center gap-2 text-xs"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Back</span>
+                    <span className="hidden sm:inline">Back to Setup</span>
                   </button>
                 </div>
               </div>
 
               {/* Question */}
-              <p className="text-xl font-medium font-heading leading-tight mt-2">
-                "{currentQuestion}"
-              </p>
+              <div className="space-y-2">
+                <p className="text-xl font-medium font-heading leading-tight">
+                  "{currentQuestion}"
+                </p>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Question {currentQuestionIndex + 1} of {generatedQuestions.length}</span>
+                  <div className="w-32 bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${((currentQuestionIndex + 1) / generatedQuestions.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+              <div className="w-full bg-gray-700 rounded-full h-1.5">
                 <div 
                   className="bg-primary h-1.5 rounded-full transition-all duration-300" 
                   style={{ width: `${Math.min(100, (elapsedTime / 3600) * 100)}%` }}
@@ -501,15 +530,27 @@ export default function Session() {
                   </Button>
                 )}
 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setCurrentQuestionIndex((p) => (p + 1) % questions.length)}
-                  className="border-white/10 hover:bg-white/5"
-                  data-testid="button-skip-question"
-                >
-                  Skip Question
-                </Button>
+                {/* Question Navigation */}
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handlePreviousQuestion}
+                    disabled={currentQuestionIndex === 0}
+                    className="border-white/10 hover:bg-white/5"
+                  >
+                    Previous
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleNextQuestion}
+                    disabled={currentQuestionIndex === generatedQuestions.length - 1}
+                    className="border-white/10 hover:bg-white/5"
+                  >
+                    Next
+                  </Button>
+                </div>
 
                 <div className="flex-1" />
 
@@ -637,7 +678,7 @@ export default function Session() {
                 {/* Scanline */}
                 <div className="w-full h-[2px] bg-primary/50 absolute top-0 animate-[scan_3s_linear_infinite] shadow-[0_0_10px_var(--color-primary)]" />
                 
-                {/* Corner brackets - increased size */}
+                {/* Corner brackets */}
                 <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-primary/50" />
                 <div className="absolute top-8 right-8 w-12 h-12 border-t-2 border-r-2 border-primary/50" />
                 <div className="absolute bottom-8 left-8 w-12 h-12 border-b-2 border-l-2 border-primary/50" />
@@ -822,166 +863,59 @@ export default function Session() {
                       <X className="w-4 h-4 mt-0.5 text-red-400 flex-shrink-0" />
                     )}
                     <div>
-                      <h4 className="font-medium text-sm">{feedback.metric}</h4>
-                      <p className="text-xs text-muted-foreground">{feedback.message}</p>
+                      <div className="font-medium text-sm">{feedback.metric}</div>
+                      <div className="text-xs text-muted-foreground mt-1">{feedback.message}</div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-4 text-muted-foreground text-sm">
+                <div className="text-center text-muted-foreground text-sm py-4">
+                  <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>AI feedback will appear here during your session</p>
-                  <p className="text-xs mt-1">We'll analyze your responses in real-time</p>
                 </div>
               )}
-              
-              <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground">Quick Tips</h4>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
-                    <span>Speak clearly and at a moderate pace</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
-                    <span>Structure your answers using the STAR method</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
-                    <span>Maintain good posture and eye contact</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </Card>
-          
-          {/* Session Controls */}
-          <Card className="bg-gray-900/50 border-white/5">
-            <div className="p-4 border-b border-white/5">
-              <h3 className="flex items-center gap-2 font-medium">
-                <Settings2 className="w-4 h-4 text-blue-400" />
-                Session Controls
-              </h3>
-            </div>
-            <div className="p-4 space-y-3">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Microphone</label>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setMicOn(!micOn)}
-                    className={`gap-1.5 ${micOn ? 'border-green-500/30 text-green-400 hover:bg-green-500/10' : 'border-red-500/30 text-red-400 hover:bg-red-500/10'}`}
-                  >
-                    {micOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-                    <span className="hidden sm:inline">{micOn ? 'On' : 'Off'}</span>
-                  </Button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Camera</label>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleToggleCamera}
-                    className={`gap-1.5 ${camOn ? 'border-green-500/30 text-green-400 hover:bg-green-500/10' : 'border-red-500/30 text-red-400 hover:bg-red-500/10'}`}
-                  >
-                    {camOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-                    <span className="hidden sm:inline">{camOn ? 'On' : 'Off'}</span>
-                  </Button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Pressure Mode</label>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setPressureMode(!pressureMode)}
-                    className={`gap-1.5 ${pressureMode ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20' : 'border-white/10'}`}
-                  >
-                    <AlertTriangle className="w-4 h-4" />
-                    <span className="hidden sm:inline">{pressureMode ? 'On' : 'Off'}</span>
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="pt-2 border-t border-white/5">
-                <p className="text-xs text-muted-foreground mb-2">Keyboard Shortcuts:</p>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-[0.7rem] font-mono">Space</kbd>
-                    <span>Play/Pause</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-[0.7rem] font-mono">Ctrl+N</kbd>
-                    <span>Toggle Notes</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-[0.7rem] font-mono">Ctrl+S</kbd>
-                    <span>Save</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-[0.7rem] font-mono">F11</kbd>
-                    <span>Fullscreen</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </Card>
 
-          {showSettings && (
-            <Card className="bg-card/40 backdrop-blur-md border-white/5">
-              <div className="p-4 border-b border-white/5 flex items-center justify-between">
-                <h3 className="flex items-center gap-2 font-medium">
-                  <Settings2 className="w-4 h-4 text-blue-400" />
-                  Interview Settings
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="border border-white/10"
-                  onClick={() => setShowSettings(false)}
-                  aria-label="Close settings"
-                >
-                  Close
-                </Button>
+          {/* Question Progress */}
+          <Card className="bg-gray-900/50 border-white/5">
+            <div className="p-4 border-b border-white/5">
+              <h3 className="flex items-center gap-2 font-medium">
+                <BookOpen className="w-4 h-4 text-blue-400" />
+                Question Progress
+              </h3>
+            </div>
+            <div className="p-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>{currentQuestionIndex + 1}/{generatedQuestions.length}</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${((currentQuestionIndex + 1) / generatedQuestions.length) * 100}%` }}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">
+                  {generatedQuestions.length - currentQuestionIndex - 1} questions remaining
+                </div>
               </div>
-              <div className="p-4">
-                <DifficultySelector
-                  difficulty={difficulty}
-                  questionType={questionType}
-                  onDifficultyChange={(d) => {
-                    setDifficulty(d);
-                    setCurrentQuestionIndex(0);
-                  }}
-                  onTypeChange={(t) => {
-                    setQuestionType(t);
-                    setCurrentQuestionIndex(0);
-                  }}
-                />
-              </div>
-            </Card>
-          )}
+            </div>
+          </Card>
         </div>
       </div>
-      
+
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={showConfirmEnd}
+        title="End Practice Session"
+        message="Are you sure you want to end this practice session? Your progress will be saved."
         onConfirm={() => {
-          if (isActive) {
-            handleEndSession();
-          } else {
-            setLocation("/");
-          }
           setShowConfirmEnd(false);
+          handleEndSession();
         }}
         onCancel={() => setShowConfirmEnd(false)}
-        title={isActive ? "End Session?" : "Leave Page?"}
-        message={
-          isActive 
-            ? "Are you sure you want to end this session? Your progress will be saved."
-            : "You have unsaved changes. Are you sure you want to leave?"
-        }
       />
     </div>
   );

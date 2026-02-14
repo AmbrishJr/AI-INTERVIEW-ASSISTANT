@@ -20,7 +20,7 @@ const difficultyConfig = {
 };
 
 const typeConfig = {
-  behavioral: { label: "Behavioral", icon: Brain, desc: "STAR method & soft skills" },
+  behavioral: { label: "Other", icon: Brain, desc: "General interview questions" },
   technical: { label: "Technical", icon: BarChart3, desc: "Problem-solving & coding" },
   hr: { label: "HR", icon: Zap, desc: "Culture fit & values" },
 };

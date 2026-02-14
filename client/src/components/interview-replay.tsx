@@ -65,7 +65,7 @@ export default function InterviewReplay({ isOpen, onClose }: { isOpen: boolean; 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4"
+          className="fixed inset-4 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-6"
           onClick={onClose}
         >
           <motion.div
@@ -73,7 +73,7 @@ export default function InterviewReplay({ isOpen, onClose }: { isOpen: boolean; 
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-5xl max-h-[90vh] flex flex-col gap-6 bg-card/95 backdrop-blur-xl rounded-2xl border border-primary/20 shadow-2xl overflow-hidden"
+            className="w-full max-w-5xl max-h-[90vh] flex flex-col gap-6 bg-card/95 backdrop-blur-xl rounded-2xl border border-primary/20 shadow-2xl overflow-hidden relative z-[70]"
           >
             {/* Header */}
             <div className="p-6 border-b border-white/5 bg-gradient-to-r from-primary/10 to-secondary/10">

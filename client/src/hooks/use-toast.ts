@@ -15,6 +15,28 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
+function toastSuccess(title: string, description?: string) {
+  return toast({
+    title,
+    description,
+  })
+}
+
+function toastInfo(title: string, description?: string) {
+  return toast({
+    title,
+    description,
+  })
+}
+
+function toastError(title: string, description?: string) {
+  return toast({
+    title,
+    description,
+    variant: "destructive",
+  })
+}
+
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
@@ -189,3 +211,5 @@ function useToast() {
 }
 
 export { useToast, toast }
+
+export { toastSuccess, toastError, toastInfo }
