@@ -1,11 +1,9 @@
 import { Link } from "wouter";
 import {
-  ArrowRight,
   Brain,
   Camera,
   LineChart,
   Zap,
-  ChevronDown,
   ChevronUp,
   Mail,
   Phone,
@@ -31,7 +29,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useAuthState } from "@/contexts/AuthStateContext";
 import { toastInfo } from "@/hooks/use-toast";
-import heroBg from "@assets/generated_images/futuristic_neural_network_data_flow_background.png";
 
 export default function Landing() {
   const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
@@ -41,7 +38,6 @@ export default function Landing() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const { isLoggedIn } = useAuthState();
-  const [typedHeadline, setTypedHeadline] = useState("");
   const [activePreview, setActivePreview] = useState<"dashboard" | "analytics" | "session">("dashboard");
   const [lang, setLang] = useState<"en" | "jp">("en");
 
@@ -96,17 +92,6 @@ export default function Landing() {
   const t = copy[lang];
 
   const fullHeadline = "Master your productivity with AI precision.";
-
-  useEffect(() => {
-    setTypedHeadline("");
-    let i = 0;
-    const id = window.setInterval(() => {
-      i += 1;
-      setTypedHeadline(fullHeadline.slice(0, i));
-      if (i >= fullHeadline.length) window.clearInterval(id);
-    }, 22);
-    return () => window.clearInterval(id);
-  }, []);
 
   const featureDetails = {
     "Cognitive Analysis": {
@@ -167,28 +152,10 @@ export default function Landing() {
     <div className="relative min-h-screen flex flex-col">
       {/* Hero Section */}
       <div className="relative h-[92vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-background/80 z-10 backdrop-blur-[2px]" />
-          <motion.div
-            className="absolute inset-0 z-10"
-            initial={{ opacity: 0.55 }}
-            animate={{ opacity: 0.75 }}
-            transition={{ duration: 2.2, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-            style={{
-              background:
-                "radial-gradient(1200px 600px at 50% 20%, rgba(0,240,255,0.18), transparent 55%), radial-gradient(900px 520px at 20% 70%, rgba(168,85,247,0.18), transparent 55%)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10" />
-          <img 
-            src={heroBg} 
-            alt="AI Neural Network" 
-            className="w-full h-full object-cover opacity-60"
-          />
-        </div>
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
 
-        <div className="absolute top-6 right-6 z-30 flex items-center gap-2">
+        <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
           <Button
             type="button"
             size="sm"
@@ -202,12 +169,6 @@ export default function Landing() {
           </Button>
         </div>
 
-        <div className="relative z-20 container mx-auto px-6 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-mono mb-6 backdrop-blur-md">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -216,10 +177,11 @@ export default function Landing() {
               {t.heroTag}
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight">
-              <span className="block">{typedHeadline}</span>
-              <span className="inline-block align-middle ml-1 h-8 w-[2px] bg-primary/80 animate-pulse" aria-hidden="true" />
+            <div className="mb-6">
+              <h1 className="text-5xl md:text-6xl font-heading font-bold text-white leading-tight">
+              {fullHeadline}
             </h1>
+            </div>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 font-light">
               {t.heroSubtitle}
@@ -252,7 +214,6 @@ export default function Landing() {
                   className="h-14 px-8 text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all hover:scale-[1.03]"
                 >
                   {isLoggedIn ? t.goDashboard : t.startFree}
-                  <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
 
@@ -310,7 +271,6 @@ export default function Landing() {
                 );
               })}
             </div>
-          </motion.div>
         </div>
       </div>
 
@@ -591,13 +551,14 @@ export default function Landing() {
                 <div className="flex items-center justify-between">
                   <div className="text-left">
                     <div className="text-sm text-muted-foreground">Dashboard</div>
-                    <div className="text-xl font-semibold text-white">Today’s Overview</div>
+                    <div className="text-xl font-semibold text-white">Tech Stack</div>
                   </div>
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
                     <Sparkles className="h-4 w-4 text-primary" />
-                    AI Summary
+                    Powered by AI
                   </div>
                 </div>
+                
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[{ label: "Sessions", value: "3" }, { label: "Avg Score", value: "86" }, { label: "Practice Time", value: "42m" }].map((s) => (
                     <div key={s.label} className="rounded-xl border border-white/10 bg-white/5 p-4">
@@ -811,13 +772,6 @@ export default function Landing() {
                       <p className="text-muted-foreground text-sm leading-relaxed">{feature.desc}</p>
                     </div>
                   </div>
-                  <div className="transition-transform duration-200">
-                    {expandedFeature === index ? (
-                      <ChevronUp className="w-6 h-6 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="w-6 h-6 text-muted-foreground" />
-                    )}
-                  </div>
                 </div>
 
                 <AnimatePresence>
@@ -889,7 +843,7 @@ export default function Landing() {
                   {expandedFAQ === index ? (
                     <ChevronUp className="w-5 h-5 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                    null
                   )}
                 </button>
                 
@@ -1003,7 +957,6 @@ export default function Landing() {
                       className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                       {isLoggedIn ? t.goDashboard : t.startNow}
-                      <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </Link>
 

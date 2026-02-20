@@ -42,7 +42,7 @@ import {
 import { Link, useLocation } from "wouter";
 import { toastInfo } from "@/hooks/use-toast";
 import { useAuthState } from "@/contexts/AuthStateContext";
-import heroBg from "@assets/generated_images/futuristic_neural_network_data_flow_background.png";
+// import heroBg from "@assets/generated_images/futuristic_neural_network_data_flow_background.png";
 
 interface ProductPulse {
   activeUsers: number;
@@ -284,11 +284,7 @@ export default function Home() {
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10" />
-          <img 
-            src={heroBg} 
-            alt="AI Neural Network" 
-            className="w-full h-full object-cover opacity-60"
-          />
+          <div className="w-full h-full bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 opacity-60" />
         </div>
         
         <div className="relative z-20 max-w-7xl mx-auto px-6">
