@@ -25,7 +25,7 @@ const Profile = ({ profileName, setProfileName }: ProfileProps) => {
   
   const [userInfo, setUserInfo] = useState({
     name: profileName,
-    email: "alex.johnson@example.com",
+    email: "ambrish.s@example.com",
     role: "Premium User"
   });
 

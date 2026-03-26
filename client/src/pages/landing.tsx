@@ -196,7 +196,7 @@ export default function Landing() {
                       key={b.label}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.15 + idx * 0.08 }}
+                      transition={{ duration: 0.3, delay: 0.05 + idx * 0.04 }}
                       className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 backdrop-blur"
                     >
                       <Icon className="h-4 w-4 text-primary" />
@@ -254,7 +254,7 @@ export default function Landing() {
                     initial={{ opacity: 0, y: 14 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.08 }}
+                    transition={{ duration: 0.3, delay: idx * 0.04 }}
                   >
                     <Card className="p-4 bg-card/40 backdrop-blur-md border border-white/5 hover:border-primary/20 transition-all duration-300">
                       <div className="flex items-center gap-3">
@@ -303,7 +303,7 @@ export default function Landing() {
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.35 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
@@ -346,7 +346,7 @@ export default function Landing() {
                 key={s.step}
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.08 }}
+                transition={{ duration: 0.3, delay: idx * 0.04 }}
                 viewport={{ once: true }}
               >
                 <Card className="h-full p-6 bg-card/40 backdrop-blur-md border border-white/5 hover:border-primary/20 transition-all duration-300 group">
@@ -382,7 +382,7 @@ export default function Landing() {
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.35 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
@@ -417,7 +417,7 @@ export default function Landing() {
                   key={f.title}
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: idx * 0.08 }}
+                  transition={{ duration: 0.3, delay: idx * 0.04 }}
                   viewport={{ once: true }}
                 >
                   <Card className="h-full p-6 bg-card/40 backdrop-blur-md border border-white/5 hover:border-primary/20 transition-all duration-300 group">
@@ -442,7 +442,7 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.15 }}
+            transition={{ duration: 0.25 }}
             viewport={{ once: true }}
             className="h-full"
           >
@@ -505,7 +505,7 @@ export default function Landing() {
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.35 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
@@ -638,7 +638,7 @@ export default function Landing() {
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.35 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
@@ -652,7 +652,7 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.3 }}
             viewport={{ once: true }}
           >
             <Card className="h-full p-6 bg-card/40 backdrop-blur-md border border-white/5 hover:border-primary/20 transition-all duration-300">
@@ -673,7 +673,7 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.08 }}
+            transition={{ duration: 0.35, delay: 0.04 }}
             viewport={{ once: true }}
           >
             <Card className="h-full p-6 bg-card/40 backdrop-blur-md border border-white/5 hover:border-primary/20 transition-all duration-300">
@@ -694,7 +694,7 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.16 }}
+            transition={{ duration: 0.35, delay: 0.08 }}
             viewport={{ once: true }}
           >
             <Card className="h-full p-6 bg-card/40 backdrop-blur-md border border-white/5 hover:border-primary/20 transition-all duration-300">
@@ -755,7 +755,7 @@ export default function Landing() {
               key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
               viewport={{ once: true }}
             >
               <div 
@@ -828,7 +828,7 @@ export default function Landing() {
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
               viewport={{ once: true }}
             >
               <Card className="overflow-hidden">
@@ -915,7 +915,7 @@ export default function Landing() {
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.35 }}
           viewport={{ once: true }}
         >
           <Card

@@ -20,7 +20,6 @@ import {
   ArrowRight,
   Brain,
   BarChart3,
-  LineChart,
   PieChart,
   Zap,
   Info,
@@ -31,6 +30,8 @@ import {
 import { toastInfo } from "@/hooks/use-toast";
 import { useAuthState } from "@/contexts/AuthStateContext";
 import { useLocation } from "wouter";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from "recharts";
 
 // Enhanced Types
 interface Session {
@@ -265,6 +266,16 @@ export default function EnhancedAnalytics() {
     };
   }, [sessions]);
 
+  // Prepare chart data for performance trends
+  const performanceChartData = useMemo(() => {
+    return sessions.map(session => ({
+      date: session.date,
+      focusScore: session.focusScore,
+      duration: session.duration,
+      sessionName: session.sessionName
+    })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [sessions]);
+
   const getInsightIcon = (type: string) => {
     switch (type) {
       case 'trend': return TrendingUp;
@@ -329,48 +340,6 @@ export default function EnhancedAnalytics() {
             </Button>
           </div>
         </div>
-
-        {/* What's Happening - Smart Highlights */}
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-blue-600" />
-              What's Happening
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <AnimatePresence>
-                {insights.slice(0, 3).map((insight, index) => {
-                  const Icon = getInsightIcon(insight.type);
-                  return (
-                    <motion.div
-                      key={insight.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className={`p-4 rounded-lg border ${getInsightColor(insight.type)}`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <Icon className="h-5 w-5 mt-0.5" />
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-sm">{insight.title}</h4>
-                          <p className="text-xs mt-1 opacity-80">{insight.description}</p>
-                          {insight.actionable && insight.recommendation && (
-                            <div className="mt-2 flex items-center gap-1">
-                              <ArrowRight className="h-3 w-3" />
-                              <span className="text-xs font-medium">{insight.recommendation}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Engagement Quality Score */}
         {engagementScore && (
@@ -498,12 +467,63 @@ export default function EnhancedAnalytics() {
                     )}
                   </div>
                 )}
-                <div className="h-64 flex items-center justify-center border-2 border-dashed border-muted rounded-lg">
-                  <div className="text-center">
-                    <LineChart className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">Performance chart visualization</p>
-                  </div>
-                </div>
+                <ChartContainer
+                  config={{
+                    focusScore: {
+                      label: "Focus Score",
+                      color: "hsl(217, 91%, 60%)",
+                    },
+                    duration: {
+                      label: "Duration (min)",
+                      color: "hsl(142, 76%, 36%)",
+                    },
+                  }}
+                  className="h-64"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={performanceChartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            labelFormatter={(value) => `Date: ${value}`}
+                            formatter={(value, name) => [
+                              `${value}`,
+                              name === 'focusScore' ? 'Focus Score' : 'Duration (min)'
+                            ]}
+                          />
+                        }
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="focusScore"
+                        stroke="hsl(217, 91%, 60%)"
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="duration"
+                        stroke="hsl(142, 76%, 36%)"
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </CardContent>
             </Card>
           </TabsContent>

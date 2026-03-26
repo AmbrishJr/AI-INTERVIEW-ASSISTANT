@@ -513,7 +513,7 @@ export default function Dashboard({ profileName }: DashboardProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="gap-2">
                     <Users className="h-4 w-4" />
-                    {isLoggedIn ? "Alex" : "Guest"}
+                    {isLoggedIn ? "Ambrish.S" : "Guest"}
                     <ChevronRight className="h-4 w-4 opacity-60" />
                   </Button>
                 </DropdownMenuTrigger>
