@@ -1,4 +1,4 @@
-# AI Coach Integration Setup
+# AICoach Integration Setup
 
 ## Integration Complete!
 
