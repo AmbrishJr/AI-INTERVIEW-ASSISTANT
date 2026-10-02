@@ -1,97 +1,60 @@
-import React, { useState } from "react";
-import { Switch, Route, useLocation } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider, useIsFetching } from "@tanstack/react-query";
+import { lazy, Suspense, type ComponentType } from "react";
+import { Route, Switch, useLocation } from "wouter";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
+import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthStateProvider } from "@/contexts/AuthStateContext";
-import NotFound from "@/pages/not-found";
-import Layout from "@/components/layout";
-import Home from "@/pages/home";
-import Login from "@/pages/login";
-import Dashboard from "@/pages/dashboard";
-import Session from "@/pages/session";
-import Practice from "@/pages/practice";
-import EnhancedAnalytics from "@/pages/analytics-enhanced";
-import Profile from "@/pages/profile";
-import News from "@/pages/news";
-import Jobs from "@/pages/jobs";
-import Projects from "@/pages/projects";
-import AIChatbot from "@/components/ai-chatbot";
-import { AnimatePresence, motion } from "framer-motion";
+import { AuthProvider } from "@/contexts/auth-context";
+import AppLayout from "@/components/layout/app-layout";
+import RequireAuth from "@/components/layout/require-auth";
+import ErrorBoundary from "@/components/layout/error-boundary";
+import { GlobalLoadingIndicator, PageLoader } from "@/components/layout/loading-indicators";
+import AIChatbot from "@/components/chatbot/ai-chatbot";
 
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error?: unknown }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
+const Home = lazy(() => import("@/pages/home"));
+const Login = lazy(() => import("@/pages/login"));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const Session = lazy(() => import("@/pages/session"));
+const Practice = lazy(() => import("@/pages/practice"));
+const Analytics = lazy(() => import("@/pages/analytics"));
+const News = lazy(() => import("@/pages/news"));
+const Jobs = lazy(() => import("@/pages/jobs"));
+const Projects = lazy(() => import("@/pages/projects"));
+const Profile = lazy(() => import("@/pages/profile"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
-  static getDerivedStateFromError(error: unknown) {
-    return { hasError: true, error };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground px-4">
-          <div className="w-full max-w-lg rounded-lg border bg-card p-6">
-            <h1 className="text-xl font-semibold">Something went wrong</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Please try refreshing the page. If the problem persists, go back to Home.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border px-4 py-2"
-                onClick={() => window.location.reload()}
-              >
-                Refresh
-              </button>
-              <button
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border px-4 py-2"
-                onClick={() => (window.location.href = "/")}
-              >
-                Go to Home
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
+interface AppRoute {
+  path: string;
+  page: ComponentType;
+  /** Wrap in the app shell (header + dock). */
+  withLayout?: boolean;
+  /** Only reachable when logged in. */
+  requiresAuth?: boolean;
 }
 
-function GlobalLoadingIndicator() {
-  const isFetching = useIsFetching();
+const ROUTES: AppRoute[] = [
+  { path: "/", page: Home },
+  { path: "/login", page: Login },
+  { path: "/dashboard", page: Dashboard, withLayout: true, requiresAuth: true },
+  { path: "/session", page: Session, withLayout: true, requiresAuth: true },
+  { path: "/practice", page: Practice, withLayout: true, requiresAuth: true },
+  { path: "/analytics", page: Analytics, withLayout: true, requiresAuth: true },
+  { path: "/profile", page: Profile, withLayout: true, requiresAuth: true },
+  { path: "/news", page: News, withLayout: true },
+  { path: "/jobs", page: Jobs, withLayout: true },
+  { path: "/projects", page: Projects, withLayout: true },
+];
 
-  return (
-    <AnimatePresence>
-      {isFetching > 0 ? (
-        <motion.div
-          key="global-loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed top-3 right-3 z-[110]"
-          aria-label="Loading"
-          role="status"
-        >
-          <div className="h-9 w-9 rounded-full border bg-background/80 backdrop-blur flex items-center justify-center shadow-sm">
-            <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/40 border-t-primary animate-spin" />
-          </div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
-  );
+function renderRoute({ page: Page, withLayout, requiresAuth }: AppRoute) {
+  let content = <Page />;
+  if (requiresAuth) content = <RequireAuth>{content}</RequireAuth>;
+  if (withLayout) content = <AppLayout>{content}</AppLayout>;
+  return content;
 }
 
 function Router() {
   const [location] = useLocation();
-  const [profileName, setProfileName] = useState("Ambrish.S");
 
   return (
     <AnimatePresence mode="wait">
@@ -102,27 +65,24 @@ function Router() {
         exit={{ opacity: 0, y: -6 }}
         transition={{ duration: 0.18, ease: "easeOut" }}
       >
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/dashboard" component={() => <Layout profileName={profileName}><Dashboard profileName={profileName} /></Layout>} />
-          <Route path="/session" component={() => <Layout><Session /></Layout>} />
-          <Route path="/practice" component={() => <Layout><Practice /></Layout>} />
-          <Route path="/analytics" component={() => <Layout><EnhancedAnalytics /></Layout>} />
-          <Route path="/news" component={() => <Layout><News /></Layout>} />
-          <Route path="/jobs" component={() => <Layout><Jobs /></Layout>} />
-          <Route path="/projects" component={() => <Layout><Projects /></Layout>} />
-          <Route path="/profile" component={() => <Layout profileName={profileName} setProfileName={setProfileName}><Profile profileName={profileName} setProfileName={setProfileName} /></Layout>} />
-          <Route component={NotFound} />
-        </Switch>
+        <Suspense fallback={<PageLoader />}>
+          <Switch>
+            {ROUTES.map((route) => (
+              <Route key={route.path} path={route.path}>
+                {renderRoute(route)}
+              </Route>
+            ))}
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
       </motion.div>
     </AnimatePresence>
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <AuthStateProvider>
+    <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
@@ -133,8 +93,6 @@ function App() {
           <AIChatbot />
         </TooltipProvider>
       </QueryClientProvider>
-    </AuthStateProvider>
+    </AuthProvider>
   );
 }
-
-export default App;

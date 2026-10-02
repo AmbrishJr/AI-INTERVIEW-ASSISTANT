@@ -9,6 +9,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import Groq from "groq-sdk";
+import { AI_COMPLETION_OPTIONS, parseAIJson } from "./ai-config";
 import dotenv from "dotenv";
 import { fetchTechNews, summarizeNewsContent } from "./services/newsService";
 import { getAIInsightsEngine } from "./services/aiInsightsEngine";
@@ -226,7 +227,7 @@ export async function registerRoutes(
 Always be supportive, professional, and provide actionable advice. Keep responses concise but comprehensive (2-3 paragraphs maximum).`;
 
       const completion = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
+        ...AI_COMPLETION_OPTIONS,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
@@ -414,7 +415,7 @@ Focus on:
 - Engagement quality and learning progress`;
 
       const completion = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
+        ...AI_COMPLETION_OPTIONS,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Analyze this analytics data for ${type} insights over ${timeframe || 'recent period'}: ${JSON.stringify(data)}` }
@@ -426,7 +427,7 @@ Focus on:
       const aiResponse = completion.choices[0]?.message?.content || '{}';
       
       try {
-        const parsedResponse = JSON.parse(aiResponse);
+        const parsedResponse = parseAIJson(aiResponse);
         res.json(parsedResponse);
       } catch (parseError) {
         // Fallback response
@@ -480,7 +481,7 @@ Keep explanations:
 - Under 150 words total`;
 
       const completion = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
+        ...AI_COMPLETION_OPTIONS,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Explain this ${chartType} chart: ${JSON.stringify(data)}. ${question ? `User question: ${question}` : ''}` }
@@ -492,7 +493,7 @@ Keep explanations:
       const aiResponse = completion.choices[0]?.message?.content || '{}';
       
       try {
-        const parsedResponse = JSON.parse(aiResponse);
+        const parsedResponse = parseAIJson(aiResponse);
         res.json(parsedResponse);
       } catch (parseError) {
         res.json({

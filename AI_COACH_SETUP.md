@@ -2,14 +2,14 @@
 
 ## Integration Complete!
 
-Your AI Coach chatbot is now integrated with **Groq's Llama 3.1** model for ultra-fast responses! Here's what has been implemented:
+Your AI Coach chatbot is now integrated with **Groq's `openai/gpt-oss-20b`** model for ultra-fast responses! Here's what has been implemented:
 
 ### **Backend Changes:**
 - Added Groq API integration (faster than OpenAI!)
 - Created `/api/chat` endpoint
 - Added specialized interview coaching system prompt
 - Implemented error handling and fallbacks
-- Using `llama-3.1-8b-instant` model for speed
+- Model set in `server/ai-config.ts` (override with `GROQ_MODEL` in `.env`)
 
 ### **Frontend Changes:**
 - Updated AI Coach component to call real AI API
@@ -19,9 +19,9 @@ Your AI Coach chatbot is now integrated with **Groq's Llama 3.1** model for ultr
 ## Setup Instructions
 
 ### **Already Configured:**
-- Groq API key: `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`
+- Groq API key: set `GROQ_API_KEY` in your local `.env` (never commit it)
 - Environment variable: `GROQ_API_KEY`
-- Model: `llama-3.1-8b-instant` (ultra-fast responses)
+- Model: `openai/gpt-oss-20b` by default; set `GROQ_MODEL` to switch
 
 ### **API Endpoint:**
 ```
@@ -53,7 +53,7 @@ Content-Type: application/json
 ### **Why Groq?**
 - **Ultra-fast responses** (instant replies)
 - **Cost-effective** (cheaper than OpenAI)
-- **High-quality** Llama 3.1 model
+- **High-quality** open-weight model via Groq
 - **Secure** API integration
 
 ## Safety Features

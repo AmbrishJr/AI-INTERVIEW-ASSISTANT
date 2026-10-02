@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk';
+import { AI_COMPLETION_OPTIONS, parseAIJson } from '../ai-config';
 import { newsCache } from './cacheService';
 
 interface InsightRequest {
@@ -281,7 +282,7 @@ Return JSON format:
   private async callAI(systemPrompt: string, userPrompt: string): Promise<InsightResponse> {
     try {
       const completion = await this.groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
+        ...AI_COMPLETION_OPTIONS,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
@@ -293,7 +294,7 @@ Return JSON format:
       const aiResponse = completion.choices[0]?.message?.content || '{}';
       
       try {
-        return JSON.parse(aiResponse);
+        return parseAIJson(aiResponse);
       } catch (parseError) {
         console.error('Failed to parse AI response:', parseError);
         return this.getFallbackResponse();

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "react-circular-progressbar/dist/styles.css";
 
 @plugin "tailwindcss-animate";
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { newsCache } from './cacheService';
+import { AI_COMPLETION_OPTIONS, parseAIJson } from '../ai-config';
 
 // News source configurations
 const NEWS_SOURCES = {
@@ -243,7 +244,7 @@ export async function summarizeNewsContent(content: string, groqClient: any) {
 Respond only with valid JSON, no additional text.`;
 
     const completion = await groqClient.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      ...AI_COMPLETION_OPTIONS,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Summarize this news article: ${content}` }
@@ -255,7 +256,7 @@ Respond only with valid JSON, no additional text.`;
     const aiResponse = completion.choices[0]?.message?.content || '{}';
     
     try {
-      return JSON.parse(aiResponse);
+      return parseAIJson(aiResponse);
     } catch (parseError) {
       return {
         summary: aiResponse,

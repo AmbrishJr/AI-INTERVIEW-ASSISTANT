@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Check, AlertCircle, Shield, Github } from "lucide-react";
-import { useAuthState } from "@/contexts/AuthStateContext";
+import { useAuth } from "@/contexts/auth-context";
+import { toastInfo } from "@/hooks/use-toast";
+import GoogleIcon from "@/components/common/google-icon";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login } = useAuthState();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -94,13 +96,11 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    // Placeholder for Google OAuth
-    alert("Google login coming soon! This will integrate with Google OAuth.");
+    toastInfo("Coming soon", "Google login will integrate with Google OAuth.");
   };
 
   const handleGitHubLogin = () => {
-    // Placeholder for GitHub OAuth
-    alert("GitHub login coming soon! This will integrate with GitHub OAuth.");
+    toastInfo("Coming soon", "GitHub login will integrate with GitHub OAuth.");
   };
 
   return (
@@ -256,7 +256,7 @@ export default function Login() {
                 className="text-primary hover:text-primary/80 transition-colors font-medium"
                 onClick={(e) => {
                   e.preventDefault();
-                  alert("Password reset coming soon! This will send a reset link to your email.");
+                  toastInfo("Coming soon", "Password reset will send a reset link to your email.");
                 }}
               >
                 Forgot password?
@@ -299,9 +299,7 @@ export default function Login() {
                   onClick={handleGoogleLogin}
                   className="w-full h-11 border-white/10 bg-white/5 hover:bg-white/10 text-white hover:scale-105 transition-all flex items-center justify-center gap-2"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M22.56 12.25c0-.138-.055-.298-.12-.464-.12-.665 0-.498.38-.665.38-.464.12-.12H5.817c-.289 0-.498.12-.665.12-.464-.12-.665C3.196 7.015 3 8.325c0 1.31.496 2.28.665.12.464.12.665.38.12.464.12.665.38.12.464.12.665C1.653 12.25 2.848 12.25 4.5c0 1.195-.496 2.28-.665-.12-.464-.12-.665C2.848 4.5 2.848 6.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 6.5 2.848 6.5 8.325c0 1.31.496 2.28.665.12.464.12.665.38.12.464.12.665C3.196 8.325 3 9.5c0 1.31.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 9.5 2.848 9.5 11.25c0 1.195-.496 2.28-.665-.12-.464-.12-.665C2.848 11.25 2.848 12.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 12.5 2.848 12.5 14.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C3.196 14.5 3 15.5c0 1.31.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 15.5 2.848 15.5 17.25c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C2.848 17.25 2.848 18.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 18.5 2.848 18.5 19.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C3.196 19.5 3 20.5c0 1.31.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 20.5 2.848 20.5 21.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C2.848 21.5 2.848 22.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C1.653 22.5 2.848 22.5 23.5c0 1.195.496 2.28.665.12.464.12.665.38.12.464.12.665C3.196 23.5 3 24.5z" fill="#4285F4"/>
-                  </svg>
+                  <GoogleIcon className="w-5 h-5" />
                   Sign in with Google
                 </Button>
                 
@@ -333,7 +331,7 @@ export default function Login() {
               className="text-primary hover:text-primary/80 transition-colors font-medium"
               onClick={(e) => {
                 e.preventDefault();
-                alert("Account creation coming soon! This will open the registration page.");
+                toastInfo("Coming soon", "Account creation will open the registration page.");
               }}
             >
               Create New Account
