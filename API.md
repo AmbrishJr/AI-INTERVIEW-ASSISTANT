@@ -130,3 +130,21 @@ curl -X POST http://localhost:3000/api/login \
 curl -X GET http://localhost:3000/api/me \
   -b cookies.txt
 ```
+
+## Interview and discovery APIs
+
+All requests use the same origin as the frontend. JSON bodies are limited to 128 KB. User responses expose only `id` and `username`. Logout destroys the server session and expires the cookie. Cookies are HTTP-only, SameSite=Lax, and secure in production.
+
+| Endpoint | Contract |
+| --- | --- |
+| `POST /api/chat` | `{ message: string }`, 1–8,000 characters. Returns `{ response }`. Missing AI configuration returns 503. |
+| `GET /api/news` | Optional category/search/source/sortBy. `limit` is an integer 1–100 (default 20); `offset` is 0–10,000. Returns `{ news, total, hasMore, source }`, where source is `live` or `unavailable`. Trending uses source scores with publication date as a tie-breaker. |
+| `POST /api/news/summarize` | `{ content: string }`, 1–20,000 characters. Returns the existing summary fields; fallback results include `source: "fallback"`. |
+| `POST /api/analytics/insights` | Requires login. `{ data: object or array, type: "general" | "trend" | "anomaly" | "recommendation", timeframe?: string }`. Returns validated `insights`; invalid AI output returns 502. |
+| `POST /api/analytics/explain` | Requires login. `{ chartType: string, data: object or array, question?: string }`. Returns a validated `explanation` and optional `nextSteps`. |
+| `POST /api/ai/insights` | Existing general insight endpoint; fallbacks include `source: "fallback"`. |
+| `GET /api/product/pulse` | `{ kpis: null, insights: [], source: "unavailable", lastUpdated: null }` until product telemetry is connected. |
+
+Registration trims usernames (1–80 characters) and requires passwords of at least 6 characters and at most 72 UTF-8 bytes. Passwords are never trimmed. Registration does not sign in automatically at the API layer; the frontend follows it with login.
+
+Session summaries, notes, goals, and bookmarks remain client-local; no server persistence endpoints were introduced for them. Clients must not interpret absent measurements as zero or treat fallback content as personalized analysis.

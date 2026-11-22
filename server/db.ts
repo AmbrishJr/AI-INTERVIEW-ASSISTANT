@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { users } from "@shared/schema";
@@ -6,7 +7,8 @@ import type { User, InsertUser } from "@shared/schema";
 
 // For development, use a local PostgreSQL database
 // In production, this should come from environment variable
-const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/modern_stack";
+const connectionString =
+  process.env.DATABASE_URL || "postgresql://localhost:5432/modern_stack";
 
 const client = postgres(connectionString);
 export const db = drizzle(client);
@@ -19,12 +21,20 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
     return result[0];
   }
 
@@ -53,6 +63,8 @@ export class MemStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    if (await this.getUserByUsername(insertUser.username))
+      throw new Error("Username already exists");
     const id = crypto.randomUUID();
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
@@ -61,6 +73,6 @@ export class MemStorage implements IStorage {
 }
 
 // Use database storage if DATABASE_URL is available, otherwise use memory storage
-export const storage = process.env.DATABASE_URL 
-  ? new DatabaseStorage() 
+export const storage = process.env.DATABASE_URL
+  ? new DatabaseStorage()
   : new MemStorage();

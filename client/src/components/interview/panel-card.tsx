@@ -12,10 +12,17 @@ interface PanelCardProps {
 }
 
 /** Card with a titled header strip, used by all interview-room panels. */
-export default function PanelCard({ icon, title, actions, className, bodyClassName, children }: PanelCardProps) {
+export default function PanelCard({
+  icon,
+  title,
+  actions,
+  className,
+  bodyClassName,
+  children,
+}: PanelCardProps) {
   return (
-    <Card className={cn("bg-gray-900/50 border-white/5", className)}>
-      <div className="p-4 border-b border-white/5 flex items-center justify-between gap-3">
+    <Card className={cn("bg-card border-border", className)}>
+      <div className="p-4 border-b border-border flex items-center justify-between gap-3">
         <h3 className="flex items-center gap-2 font-medium">
           {icon}
           {title}

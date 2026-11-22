@@ -18,7 +18,7 @@ export function GlobalLoadingIndicator() {
           aria-label="Loading"
           role="status"
         >
-          <div className="h-9 w-9 rounded-full border bg-background/80 backdrop-blur flex items-center justify-center shadow-sm">
+          <div className="h-9 w-9 rounded-full border bg-background/80  flex items-center justify-center shadow-sm">
             <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/40 border-t-primary animate-spin" />
           </div>
         </motion.div>
@@ -30,7 +30,11 @@ export function GlobalLoadingIndicator() {
 /** Fallback shown while a lazily loaded page chunk downloads. */
 export function PageLoader() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center" role="status" aria-label="Loading page">
+    <div
+      className="min-h-[60vh] flex items-center justify-center"
+      role="status"
+      aria-label="Loading page"
+    >
       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
     </div>
   );

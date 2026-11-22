@@ -1,3 +1,4 @@
+import { readLocal, writeLocal } from "./local-data";
 /**
  * Persistence for completed interview sessions and the in-progress notes draft.
  * Shared by the interview room (writes) and the dashboard (reads).
@@ -6,7 +7,7 @@
 /** Measured performance for one session (all percentages 0-100). */
 export interface SessionMetrics {
   /** Share of session time the microphone detected you speaking. */
-  talkPct: number;
+  talkPct: number | null;
   /** Share of camera-on time a single face was in frame (null if the camera was off). */
   faceVisiblePct: number | null;
   /** Share of camera-on time you were facing the camera. */
@@ -22,6 +23,8 @@ export interface SessionRecord {
   duration: number;
   date: string;
   notes: string;
+  status?: "active" | "paused" | "completed";
+  context?: string;
   metrics?: SessionMetrics;
 }
 
@@ -31,17 +34,26 @@ const MAX_HISTORY = 10;
 
 export function loadSessionHistory(): SessionRecord[] {
   try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(HISTORY_KEY) ?? "[]");
+    const parsed: unknown = JSON.parse(readLocal(HISTORY_KEY) ?? "[]");
     if (!Array.isArray(parsed)) return [];
     return parsed
       .map((s) => ({
         id: String(s?.id ?? ""),
-        duration: Number(s?.duration ?? 0),
+        duration: Number.isFinite(Number(s?.duration))
+          ? Math.max(0, Number(s.duration))
+          : 0,
         date: String(s?.date ?? ""),
         notes: String(s?.notes ?? ""),
-        metrics: s?.metrics && typeof s.metrics === "object" ? (s.metrics as SessionMetrics) : undefined,
+        status: ["active", "paused", "completed"].includes(s?.status)
+          ? (s.status as SessionRecord["status"])
+          : undefined,
+        context: typeof s?.context === "string" ? s.context : undefined,
+        metrics:
+          s?.metrics && typeof s.metrics === "object"
+            ? (s.metrics as SessionMetrics)
+            : undefined,
       }))
-      .filter((s) => s.id && s.date);
+      .filter((s) => s.id && Number.isFinite(Date.parse(s.date)));
   } catch {
     return [];
   }
@@ -51,17 +63,16 @@ export function loadSessionHistory(): SessionRecord[] {
 export function upsertSessionRecord(record: SessionRecord): SessionRecord[] {
   const rest = loadSessionHistory().filter((s) => s.id !== record.id);
   const next = [record, ...rest].slice(0, MAX_HISTORY);
-  try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
-  } catch {
-    // ignore storage failures
-  }
+  if (!writeLocal(HISTORY_KEY, JSON.stringify(next)))
+      throw new Error(
+        "Session kept for this visit only. Browser storage is unavailable.",
+      );
   return next;
 }
 
 export function loadNotesDraft(): string {
   try {
-    return localStorage.getItem(NOTES_KEY) ?? "";
+    return readLocal(NOTES_KEY) ?? "";
   } catch {
     return "";
   }
@@ -69,8 +80,8 @@ export function loadNotesDraft(): string {
 
 export function saveNotesDraft(notes: string) {
   try {
-    if (notes) localStorage.setItem(NOTES_KEY, notes);
-    else localStorage.removeItem(NOTES_KEY);
+    if (notes) writeLocal(NOTES_KEY, notes);
+    else writeLocal(NOTES_KEY, null);
   } catch {
     // ignore storage failures
   }

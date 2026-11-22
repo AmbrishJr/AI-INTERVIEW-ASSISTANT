@@ -1,4 +1,5 @@
-export type NewsCategory = "tech" | "hiring" | "layoffs" | "projects" | "internships";
+export type NewsCategory =
+  "tech" | "hiring" | "layoffs" | "projects" | "internships";
 
 export interface NewsItem {
   id: string;
@@ -16,72 +17,42 @@ export interface NewsItem {
   tags: string[];
 }
 
-/** Shown when the /api/news endpoint is unreachable (e.g. running the client alone). */
+/** Explicit examples used only when the live feed is unavailable. */
 export const FALLBACK_NEWS: NewsItem[] = [
   {
-    id: "1",
-    title: "OpenAI Announces GPT-5 with Enhanced Reasoning Capabilities",
-    summary: "OpenAI reveals GPT-5 featuring improved logical reasoning, reduced hallucinations, and better performance on complex technical tasks. The model shows significant improvements in code generation and mathematical problem-solving.",
+    id: "sample-tech",
+    title: "Sample: a new developer tool",
+    summary:
+      "An example article about evaluating a developer tool: consider documentation, compatibility, and maintenance before adopting it.",
     category: "tech",
-    source: "TechCrunch",
-    url: "https://techcrunch.com/openai-gpt5",
-    publishedAt: "2024-01-23T10:30:00Z",
-    companyName: "OpenAI",
-    techStack: ["AI/ML", "NLP", "Deep Learning"],
-    impact: "Major advancement in AI capabilities",
-    tags: ["AI", "Machine Learning", "GPT-5", "OpenAI"]
+    source: "Illustrative example",
+    url: "",
+    publishedAt: "",
+    techStack: ["Developer tools"],
+    tags: ["development", "tools"],
   },
   {
-    id: "2",
-    title: "Google Hiring 1000+ Engineers for Cloud AI Division",
-    summary: "Google Cloud is expanding its AI team with over 1000 new positions across software engineering, machine learning, and cloud infrastructure roles. Positions available in Mountain View, Seattle, and remote.",
+    id: "sample-hiring",
+    title: "Sample: preparing for a software role",
+    summary:
+      "An example hiring brief. Compare a role’s responsibilities with projects you can discuss clearly during an interview.",
     category: "hiring",
-    source: "Google Careers",
-    url: "https://careers.google.com",
-    publishedAt: "2024-01-23T09:15:00Z",
-    companyName: "Google",
-    location: "Mountain View, Seattle, Remote",
-    role: "Software Engineer, ML Engineer",
-    techStack: ["Google Cloud", "TensorFlow", "Kubernetes"],
-    tags: ["Google", "Hiring", "Cloud", "AI", "Remote"]
+    source: "Illustrative example",
+    url: "",
+    publishedAt: "",
+    techStack: ["Software Engineering"],
+    tags: ["hiring", "interview"],
   },
   {
-    id: "3",
-    title: "Meta Layoffs 5000 Tech Workers in Restructuring",
-    summary: "Meta cuts 5000 positions primarily in middle management and non-technical roles as part of \"Year of Efficiency\" initiative. Engineering teams relatively unaffected with focus on AI and metaverse development.",
-    category: "layoffs",
-    source: "The Verge",
-    url: "https://theverge.com/meta-layoffs",
-    publishedAt: "2024-01-22T16:45:00Z",
-    companyName: "Meta",
-    impact: "Major restructuring affecting 5000 employees",
-    tags: ["Meta", "Layoffs", "Restructuring", "Meta"]
-  },
-  {
-    id: "4",
-    title: "Microsoft Launches Open Source AI Development Framework",
-    summary: "Microsoft releases new open-source framework for AI development, integrating with Azure and supporting multiple ML frameworks. Aims to democratize AI development with enterprise-grade tools.",
+    id: "sample-projects",
+    title: "Sample: learning through open source",
+    summary:
+      "An example project update. Reading an issue, writing a test, and explaining a small fix can be useful interview practice.",
     category: "projects",
-    source: "Microsoft Blog",
-    url: "https://blogs.microsoft.com/ai-framework",
-    publishedAt: "2024-01-22T14:20:00Z",
-    companyName: "Microsoft",
-    techStack: ["Azure", "Python", "TypeScript", "ML"],
-    impact: "Open source AI tools for developers",
-    tags: ["Microsoft", "Open Source", "AI", "Azure", "Development"]
+    source: "Illustrative example",
+    url: "",
+    publishedAt: "",
+    techStack: ["Open source"],
+    tags: ["projects", "learning"],
   },
-  {
-    id: "5",
-    title: "Amazon Offers 500 Summer Internships for CS Students",
-    summary: "Amazon Web Services announces 500 paid summer internship positions for computer science students. Roles include software development, cloud engineering, and data science. Applications close March 1st.",
-    category: "internships",
-    source: "Amazon Jobs",
-    url: "https://www.amazon.jobs/internships",
-    publishedAt: "2024-01-21T11:30:00Z",
-    companyName: "Amazon",
-    location: "Seattle, Austin, Arlington",
-    role: "SDE Intern, Data Science Intern",
-    techStack: ["AWS", "Java", "Python", "Distributed Systems"],
-    tags: ["Amazon", "Internships", "Summer 2024", "AWS", "Students"]
-  }
 ];

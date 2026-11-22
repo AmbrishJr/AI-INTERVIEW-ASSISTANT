@@ -16,6 +16,7 @@ export interface SpeechAnalysis {
   error: string | null;
   /** The microphone itself couldn't be opened (so silence can't be measured). */
   micError: boolean;
+  micReady: boolean;
   /** Voice is clearly present but recognition returns no words (unsupported/offline service). */
   transcriptStalled: boolean;
   /** Voice activity from the microphone volume, independent of recognition. */
@@ -31,7 +32,8 @@ export interface SpeechAnalysis {
 }
 
 // Disfluencies only: words like "like" or "so" have too many legitimate uses to flag.
-const FILLER_PATTERN = /\b(um+|uh+|erm+|uhm+|hmm+|you know|i mean|basically|literally)\b/gi;
+const FILLER_PATTERN =
+  /\b(um+|uh+|erm+|uhm+|hmm+|you know|i mean|basically|literally)\b/gi;
 const MIN_WORDS_FOR_PACE = 6;
 const MIN_SECONDS_FOR_PACE = 2;
 const VAD_INTERVAL_MS = 100;
@@ -41,24 +43,32 @@ const VAD_HANGOVER_MS = 600;
 const STALL_SPEAKING_MS = 15_000;
 
 const ERROR_MESSAGES: Record<string, string> = {
-  "not-allowed": "Microphone permission was denied. Allow it in the address bar to get speech feedback.",
+  "not-allowed":
+    "Microphone permission was denied. Allow it in the address bar to get speech feedback.",
   "service-not-allowed": "Speech recognition is blocked in this browser.",
   "audio-capture": "No microphone was found.",
   network: "Speech recognition needs an internet connection.",
 };
 
-const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
+const countWords = (text: string) =>
+  text.trim().split(/\s+/).filter(Boolean).length;
 
 const getRecognitionCtor = () =>
-  typeof window === "undefined" ? undefined : window.SpeechRecognition ?? window.webkitSpeechRecognition;
+  typeof window === "undefined"
+    ? undefined
+    : (window.SpeechRecognition ?? window.webkitSpeechRecognition);
 
 /**
  * Listens to the microphone while `enabled`: detects real voice activity from the
  * audio level and transcribes speech with the browser's speech recognition.
  */
-export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string) => void): SpeechAnalysis {
+export function useSpeechAnalysis(
+  enabled: boolean,
+  onFinalText?: (text: string) => void,
+): SpeechAnalysis {
   const supported = Boolean(getRecognitionCtor());
   const [error, setError] = useState<string | null>(null);
+  const [micReady, setMicReady] = useState(false);
   const [micError, setMicError] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [level, setLevel] = useState(0);
@@ -76,6 +86,7 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
   // --- Voice activity detection from raw microphone volume ---
   useEffect(() => {
     if (!enabled) {
+      setMicReady(false);
       setIsSpeaking(false);
       setLevel(0);
       return;
@@ -89,8 +100,15 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
     let audioCtx: AudioContext | undefined;
     let timer: ReturnType<typeof setInterval> | undefined;
 
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMicError(true);
+      setError("Microphone access is unavailable in this browser.");
+      return;
+    }
     navigator.mediaDevices
-      .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
+      .getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
+      })
       .then(async (s) => {
         if (cancelled) {
           s.getTracks().forEach((t) => t.stop());
@@ -99,6 +117,12 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
         stream = s;
         audioCtx = new AudioContext();
         await audioCtx.resume();
+        if (cancelled) {
+          s.getTracks().forEach((t) => t.stop());
+          void audioCtx.close().catch(() => {});
+          return;
+        }
+        setMicReady(true);
         const analyser = audioCtx.createAnalyser();
         analyser.fftSize = 1024;
         audioCtx.createMediaStreamSource(s).connect(analyser);
@@ -113,7 +137,8 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
         timer = setInterval(() => {
           analyser.getFloatTimeDomainData(samples);
           let sum = 0;
-          for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+          for (let i = 0; i < samples.length; i++)
+            sum += samples[i] * samples[i];
           const rms = Math.sqrt(sum / samples.length);
 
           const threshold = Math.max(noiseFloor * 3, 0.02);
@@ -132,7 +157,8 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
           if (nowSpeaking) {
             lastSpokeAtRef.current = lastVoiceAt;
             voicedSinceResultMs.current += VAD_INTERVAL_MS;
-            if (voicedSinceResultMs.current >= STALL_SPEAKING_MS) setTranscriptStalled(true);
+            if (voicedSinceResultMs.current >= STALL_SPEAKING_MS)
+              setTranscriptStalled(true);
           }
 
           const nextLevel = Math.min(1, rms / 0.15);
@@ -145,14 +171,19 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
       .catch((err: DOMException) => {
         if (cancelled) return;
         setMicError(true);
-        setError(ERROR_MESSAGES[err.name === "NotAllowedError" ? "not-allowed" : "audio-capture"]);
+        setError(
+          ERROR_MESSAGES[
+            err.name === "NotAllowedError" ? "not-allowed" : "audio-capture"
+          ],
+        );
       });
 
     return () => {
       cancelled = true;
       clearInterval(timer);
       stream?.getTracks().forEach((t) => t.stop());
-      audioCtx?.close();
+      void audioCtx?.close().catch(() => {});
+      setMicReady(false);
       setIsSpeaking(false);
       setLevel(0);
     };
@@ -191,17 +222,25 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
 
         const words = countWords(text);
         const seconds = (performance.now() - segmentStartedAt) / 1000;
-        const fillers = (text.match(FILLER_PATTERN) ?? []).map((f) => f.toLowerCase());
+        const fillers = (text.match(FILLER_PATTERN) ?? []).map((f) =>
+          f.toLowerCase(),
+        );
         segmentStartedAt = null;
 
         setLastSegment({
           id: ++segmentId,
           text,
           words,
-          wpm: words >= MIN_WORDS_FOR_PACE && seconds >= MIN_SECONDS_FOR_PACE ? Math.round(words / (seconds / 60)) : null,
+          wpm:
+            words >= MIN_WORDS_FOR_PACE && seconds >= MIN_SECONDS_FOR_PACE
+              ? Math.round(words / (seconds / 60))
+              : null,
           fillers,
         });
-        setTotals((t) => ({ words: t.words + words, fillers: t.fillers + fillers.length }));
+        setTotals((t) => ({
+          words: t.words + words,
+          fillers: t.fillers + fillers.length,
+        }));
         onFinalTextRef.current?.(text);
       }
       setInterim(interimText.trim());
@@ -210,8 +249,15 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
     recognition.onerror = (event) => {
       // "no-speech" and "aborted" are normal during silence or restarts.
       if (event.error === "no-speech" || event.error === "aborted") return;
-      setError(ERROR_MESSAGES[event.error] ?? `Speech recognition error: ${event.error}`);
-      if (event.error === "not-allowed" || event.error === "service-not-allowed") stopped = true;
+      setError(
+        ERROR_MESSAGES[event.error] ??
+          `Speech recognition error: ${event.error}`,
+      );
+      if (
+        event.error === "not-allowed" ||
+        event.error === "service-not-allowed"
+      )
+        stopped = true;
     };
 
     // Browsers end continuous recognition after a while; keep it running while enabled.
@@ -237,8 +283,13 @@ export function useSpeechAnalysis(enabled: boolean, onFinalText?: (text: string)
 
   return {
     supported,
-    error: error ?? (supported ? null : "Live transcript needs Chrome, Edge or Safari. Voice activity is still measured."),
+    error:
+      error ??
+      (supported
+        ? null
+        : "Live transcript needs Chrome, Edge or Safari. Voice activity is still measured."),
     micError,
+    micReady,
     transcriptStalled,
     isSpeaking,
     level,

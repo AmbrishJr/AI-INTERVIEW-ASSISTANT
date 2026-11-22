@@ -1,3 +1,4 @@
+import { toastError } from "@/hooks/use-toast";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   loadNotesDraft,
@@ -16,7 +17,10 @@ export interface TranscriptMessage {
 }
 
 const INITIAL_TRANSCRIPT: TranscriptMessage[] = [
-  { role: "ai", text: "Hello! I'm your AI interviewer today. Let's start with the question on your screen." },
+  {
+    role: "ai",
+    text: "Hello! I'm your AI interviewer today. Let's start with the question on your screen.",
+  },
 ];
 
 const AUTO_SAVE_INTERVAL_MS = 60_000;
@@ -25,11 +29,12 @@ const AUTO_SAVE_INTERVAL_MS = 60_000;
  * State and actions for a single mock-interview run: timer with pause/resume,
  * question navigation, the transcript, notes and persistence.
  */
-export function useInterviewSession(questions: string[]) {
+export function useInterviewSession(questions: string[], context?: string) {
   const [status, setStatus] = useState<SessionStatus>("idle");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [transcript, setTranscript] = useState<TranscriptMessage[]>(INITIAL_TRANSCRIPT);
+  const [transcript, setTranscript] =
+    useState<TranscriptMessage[]>(INITIAL_TRANSCRIPT);
   const [notes, setNotesState] = useState(loadNotesDraft);
   const [history, setHistory] = useState<SessionRecord[]>(loadSessionHistory);
   const [autoSave, setAutoSave] = useState(true);
@@ -44,7 +49,9 @@ export function useInterviewSession(questions: string[]) {
   const currentQuestion = questions[questionIndex] ?? "";
 
   const readElapsedSeconds = () => {
-    const runningMs = runStartedAt.current ? Date.now() - runStartedAt.current : 0;
+    const runningMs = runStartedAt.current
+      ? Date.now() - runStartedAt.current
+      : 0;
     return Math.floor((accumulatedMs.current + runningMs) / 1000);
   };
 
@@ -61,22 +68,35 @@ export function useInterviewSession(questions: string[]) {
   }, []);
 
   const saveRecord = useCallback(
-    (metrics?: SessionMetrics) => {
+    (metrics?: SessionMetrics, savedStatus?: SessionRecord["status"]) => {
       saveNotesDraft(notes);
       if (sessionMeta.current) {
-        setHistory(
-          upsertSessionRecord({
-            id: sessionMeta.current.id,
-            date: sessionMeta.current.startedAt,
-            duration: readElapsedSeconds(),
-            notes,
-            metrics,
-          }),
-        );
+        try {
+          setHistory(
+            upsertSessionRecord({
+              id: sessionMeta.current.id,
+              date: sessionMeta.current.startedAt,
+              duration: readElapsedSeconds(),
+              notes,
+              metrics,
+              status:
+                savedStatus ?? (status === "paused" ? "paused" : "active"),
+              context,
+            }),
+          );
+        } catch (error) {
+          toastError(
+            "Saved for this visit only",
+            error instanceof Error
+              ? error.message
+              : "Browser storage is unavailable.",
+          );
+          return;
+        }
       }
       setLastSaved(new Date());
     },
-    [notes],
+    [notes, status, context],
   );
 
   /** Saves notes and the in-progress session (used by the Save button and auto-save). */
@@ -85,9 +105,13 @@ export function useInterviewSession(questions: string[]) {
   const start = useCallback(() => {
     accumulatedMs.current = 0;
     runStartedAt.current = Date.now();
-    sessionMeta.current = { id: Date.now().toString(), startedAt: new Date().toISOString() };
+    sessionMeta.current = {
+      id: Date.now().toString(),
+      startedAt: new Date().toISOString(),
+    };
     setElapsedSeconds(0);
     setTranscript(INITIAL_TRANSCRIPT);
+    setQuestionIndex(0);
     setStatus("running");
   }, []);
 
@@ -113,7 +137,7 @@ export function useInterviewSession(questions: string[]) {
   /** Saves the run (with its measured metrics, if any) and returns to idle. */
   const end = useCallback(
     (metrics?: SessionMetrics) => {
-      saveRecord(metrics);
+      saveRecord(metrics, "completed");
       resetTimer();
       setStatus("idle");
     },
@@ -125,6 +149,8 @@ export function useInterviewSession(questions: string[]) {
     resetTimer();
     setStatus("idle");
     setNotes("");
+    setQuestionIndex(0);
+    setTranscript(INITIAL_TRANSCRIPT);
   }, [setNotes]);
 
   /** Appends recognised speech from the candidate to the transcript. */
@@ -136,7 +162,10 @@ export function useInterviewSession(questions: string[]) {
     () => setQuestionIndex((i) => Math.min(i + 1, questions.length - 1)),
     [questions.length],
   );
-  const previousQuestion = useCallback(() => setQuestionIndex((i) => Math.max(i - 1, 0)), []);
+  const previousQuestion = useCallback(
+    () => setQuestionIndex((i) => Math.max(i - 1, 0)),
+    [],
+  );
 
   // Start from the first question whenever the question set changes.
   useEffect(() => setQuestionIndex(0), [questions]);
@@ -161,7 +190,11 @@ export function useInterviewSession(questions: string[]) {
   useEffect(() => {
     if (!isActive || !currentQuestion) return;
     const text = `Question: "${currentQuestion}"`;
-    setTranscript((prev) => (prev[prev.length - 1]?.text === text ? prev : [...prev, { role: "ai", text }]));
+    setTranscript((prev) =>
+      prev[prev.length - 1]?.text === text
+        ? prev
+        : [...prev, { role: "ai", text }],
+    );
   }, [currentQuestion, isActive]);
 
   return {

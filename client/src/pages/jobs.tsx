@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FilterSelect, matchesQuery, SearchInput } from "@/components/common/filters";
+import {
+  FilterSelect,
+  matchesQuery,
+  SearchInput,
+} from "@/components/common/filters";
 import PageHeader from "@/components/common/page-header";
 import JobCard from "@/components/jobs/job-card";
 import MarketTrends from "@/components/jobs/market-trends";
@@ -43,7 +47,8 @@ const SORT_OPTIONS = [
 
 type SortKey = (typeof SORT_OPTIONS)[number]["value"];
 
-const salaryFloor = (job: Job) => parseInt(job.salary?.match(/\d+/)?.[0] ?? "0", 10);
+const salaryFloor = (job: Job) =>
+  parseInt(job.salary?.match(/\d+/)?.[0] ?? "0", 10);
 
 const SORTERS: Record<SortKey, (a: Job, b: Job) => number> = {
   latest: (a, b) => a.postedDaysAgo - b.postedDaysAgo,
@@ -54,9 +59,12 @@ const SORTERS: Record<SortKey, (a: Job, b: Job) => number> = {
 
 export default function Jobs() {
   const [query, setQuery] = useState("");
-  const [type, setType] = useState<(typeof TYPE_OPTIONS)[number]["value"]>("all");
-  const [experience, setExperience] = useState<(typeof EXPERIENCE_OPTIONS)[number]["value"]>("all");
-  const [location, setLocation] = useState<(typeof LOCATION_OPTIONS)[number]["value"]>("all");
+  const [type, setType] =
+    useState<(typeof TYPE_OPTIONS)[number]["value"]>("all");
+  const [experience, setExperience] =
+    useState<(typeof EXPERIENCE_OPTIONS)[number]["value"]>("all");
+  const [location, setLocation] =
+    useState<(typeof LOCATION_OPTIONS)[number]["value"]>("all");
   const [sortBy, setSortBy] = useState<SortKey>("latest");
   const bookmarks = useBookmarks("Job");
 
@@ -64,7 +72,13 @@ export default function Jobs() {
     () =>
       JOBS.filter(
         (job) =>
-          matchesQuery(query, job.title, job.company, job.techStack, job.skills) &&
+          matchesQuery(
+            query,
+            job.title,
+            job.company,
+            job.techStack,
+            job.skills,
+          ) &&
           (type === "all" || job.type === type) &&
           (experience === "all" || job.experience === experience) &&
           (location === "all" || job.location.toLowerCase().includes(location)),
@@ -74,7 +88,14 @@ export default function Jobs() {
 
   return (
     <div className="max-w-7xl mx-auto py-6 space-y-6">
-      <PageHeader title="Tech Opportunities" description="Discover your next career move in technology" />
+      <PageHeader
+        title="Opportunities"
+        description="Explore roles, skills, and where you could go next."
+      />
+      <p className="rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
+        Sample catalog · Listings, counts, dates, and trends are illustrative
+        and are not updated live. Check the linked source for current details.
+      </p>
 
       <Tabs defaultValue="jobs" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
@@ -84,19 +105,45 @@ export default function Jobs() {
 
         <TabsContent value="jobs" className="space-y-6">
           <Card>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-5 gap-4">
-              <SearchInput value={query} onChange={setQuery} placeholder="Search jobs, skills..." />
-              <FilterSelect value={type} onChange={setType} options={TYPE_OPTIONS} placeholder="Job Type" />
-              <FilterSelect value={experience} onChange={setExperience} options={EXPERIENCE_OPTIONS} placeholder="Experience" />
-              <FilterSelect value={location} onChange={setLocation} options={LOCATION_OPTIONS} placeholder="Location" />
-              <FilterSelect value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} placeholder="Sort By" />
+            <CardContent className="p-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3">
+              <SearchInput
+                value={query}
+                onChange={setQuery}
+                placeholder="Search jobs, skills..."
+              />
+              <FilterSelect
+                value={type}
+                onChange={setType}
+                options={TYPE_OPTIONS}
+                placeholder="Job Type"
+              />
+              <FilterSelect
+                value={experience}
+                onChange={setExperience}
+                options={EXPERIENCE_OPTIONS}
+                placeholder="Experience"
+              />
+              <FilterSelect
+                value={location}
+                onChange={setLocation}
+                options={LOCATION_OPTIONS}
+                placeholder="Location"
+              />
+              <FilterSelect
+                value={sortBy}
+                onChange={setSortBy}
+                options={SORT_OPTIONS}
+                placeholder="Sort By"
+              />
             </CardContent>
           </Card>
 
           {jobs.length === 0 ? (
-            <p className="text-center text-muted-foreground py-12">No jobs match your filters.</p>
+            <p className="text-center text-muted-foreground py-12">
+              No jobs match your filters.
+            </p>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               <AnimatePresence>
                 {jobs.map((job) => (
                   <motion.div

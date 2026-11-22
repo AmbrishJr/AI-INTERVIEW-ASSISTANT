@@ -9,18 +9,17 @@ import { ArrowLeft, Gauge, Home, Search } from "lucide-react";
 export default function NotFound() {
   const [, navigate] = useLocation();
   const [query, setQuery] = useState("");
-  const [redirectEnabled, setRedirectEnabled] = useState(true);
+  const [redirectEnabled, setRedirectEnabled] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(10);
 
   const routes = useMemo(
-    () =>
-      [
-        { label: "Home", path: "/" },
-        { label: "Dashboard", path: "/dashboard" },
-        { label: "Session", path: "/session" },
-        { label: "Analytics", path: "/analytics" },
-        { label: "Login", path: "/login" },
-      ],
+    () => [
+      { label: "Home", path: "/" },
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Session", path: "/session" },
+      { label: "Analytics", path: "/analytics" },
+      { label: "Login", path: "/login" },
+    ],
     [],
   );
 
@@ -28,7 +27,8 @@ export default function NotFound() {
     const q = query.trim().toLowerCase();
     if (!q) return routes;
     return routes.filter(
-      (r) => r.label.toLowerCase().includes(q) || r.path.toLowerCase().includes(q),
+      (r) =>
+        r.label.toLowerCase().includes(q) || r.path.toLowerCase().includes(q),
     );
   }, [query, routes]);
 
@@ -66,12 +66,20 @@ export default function NotFound() {
               <motion.div
                 className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10"
                 animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
               <motion.div
                 className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20"
                 animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 2.1, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2.1,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
               <motion.div
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -81,16 +89,21 @@ export default function NotFound() {
               >
                 <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 shadow-sm">
                   <Search className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-gray-900">Lost?</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    Lost?
+                  </span>
                 </div>
               </motion.div>
             </div>
 
             <div className="space-y-4">
               <div className="space-y-1">
-                <h1 className="text-3xl font-bold text-gray-900">Page Not Found</h1>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Page Not Found
+                </h1>
                 <p className="text-sm text-gray-600">
-                  The page you’re looking for doesn’t exist or may have been moved.
+                  The page you’re looking for doesn’t exist or may have been
+                  moved.
                 </p>
               </div>
 
@@ -152,7 +165,8 @@ export default function NotFound() {
 
                 {redirectEnabled ? (
                   <span>
-                    Redirecting to Home in <span className="font-medium">{secondsLeft}s</span>
+                    Redirecting to Home in{" "}
+                    <span className="font-medium">{secondsLeft}s</span>
                   </span>
                 ) : null}
 

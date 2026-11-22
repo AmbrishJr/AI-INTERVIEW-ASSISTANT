@@ -21,7 +21,7 @@ export default function NotesPanel({
 }: NotesPanelProps) {
   return (
     <PanelCard
-      icon={<BookOpen className="w-4 h-4 text-blue-400" />}
+      icon={<BookOpen className="w-4 h-4 text-blue-700" />}
       title="Session Notes"
       actions={
         <div className="flex items-center gap-3">
@@ -35,17 +35,20 @@ export default function NotesPanel({
             Auto-save
           </label>
           {lastSaved && (
-            <span className="text-xs text-muted-foreground">Last saved: {lastSaved.toLocaleTimeString()}</span>
+            <span className="text-xs text-muted-foreground">
+              Last saved: {lastSaved.toLocaleTimeString()}
+            </span>
           )}
         </div>
       }
     >
       <textarea
+        aria-label="Session notes"
         ref={textareaRef}
         value={notes}
         onChange={(e) => onNotesChange(e.target.value)}
         placeholder="Type your notes here..."
-        className="w-full h-40 p-3 bg-gray-800/50 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent resize-none"
+        className="w-full h-40 p-3 bg-muted/50 border border-border rounded-md text-sm text-foreground placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent resize-none"
       />
       <div className="mt-2 flex justify-between items-center text-xs text-muted-foreground">
         <span>Press Ctrl+S to save manually</span>

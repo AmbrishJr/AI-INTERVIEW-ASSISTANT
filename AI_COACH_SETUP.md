@@ -1,109 +1,11 @@
-# AICoach Integration Setup
+# AI coach setup
 
-## Integration Complete!
+Set `GROQ_API_KEY` in the local `.env` file and run `npm run dev`. The frontend calls same-origin `/api/chat`; `npm run dev:client` proxies `/api` to port 3000. Keep API keys on the server.
 
-Your AI Coach chatbot is now integrated with **Groq's `openai/gpt-oss-20b`** model for ultra-fast responses! Here's what has been implemented:
+`GROQ_MODEL` overrides the default `openai/gpt-oss-20b` model in `server/ai-config.ts`. Choose a model compatible with the configured completion options.
 
-### **Backend Changes:**
-- Added Groq API integration (faster than OpenAI!)
-- Created `/api/chat` endpoint
-- Added specialized interview coaching system prompt
-- Implemented error handling and fallbacks
-- Model set in `server/ai-config.ts` (override with `GROQ_MODEL` in `.env`)
+The coach offers interview-preparation guidance. It does not automatically receive session notes or recordings. Chat sends the typed message; analytics sends saved measurements only after the user requests an explanation or insights. These requests go to the configured AI provider.
 
-### **Frontend Changes:**
-- Updated AI Coach component to call real AI API
-- Added error handling with fallback responses
-- Maintained existing UI/UX
+Without a key, AI endpoints return 503 and the interface shows a configuration message with retry. Generic practice tips are labeled separately. Invalid structured analytics responses return 502 rather than invented statistics. News-summary fallback responses identify themselves as fallback content.
 
-## Setup Instructions
-
-### **Already Configured:**
-- Groq API key: set `GROQ_API_KEY` in your local `.env` (never commit it)
-- Environment variable: `GROQ_API_KEY`
-- Model: `openai/gpt-oss-20b` by default; set `GROQ_MODEL` to switch
-
-### **API Endpoint:**
-```
-POST http://localhost:3000/api/chat
-Content-Type: application/json
-
-{
-  "message": "How should I prepare for a technical interview?"
-}
-```
-
-### **Response:**
-```json
-{
-  "response": "Preparing for a technical interview requires a strategic approach..."
-}
-```
-
-## Features
-
-### **AI Coach Capabilities:**
-- Interview preparation tips
-- Common interview questions and answers
-- Body language and presentation guidance
-- Confidence building techniques
-- Industry-specific interview advice
-- Resume and portfolio recommendations
-
-### **Why Groq?**
-- **Ultra-fast responses** (instant replies)
-- **Cost-effective** (cheaper than OpenAI)
-- **High-quality** open-weight model via Groq
-- **Secure** API integration
-
-## Safety Features
-
-- **Input validation** with Zod schemas
-- **Error handling** with fallback responses
-- **API key protection** through environment variables
-- **Rate limiting ready** (can be added)
-- **Content filtering** through OpenAI's built-in safety
-
-## 🧪 Testing
-
-### Test the API directly:
-```bash
-curl -X POST http://localhost:3000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message":"What are common behavioral interview questions?"}'
-```
-
-### Test via Frontend:
-1. Open http://localhost:5001
-2. Click the AI Coach button (bottom-right)
-3. Type a message and send
-4. Should receive AI-powered responses
-
-## 🔄 Fallback Mode
-
-If no API key is set, the system will:
-1. Show a configuration error message
-2. Provide helpful interview tips as fallback
-3. Maintain full UI functionality
-
-## 📝 System Prompt
-
-The AI Coach uses a specialized system prompt:
-```
-You are an AI Interview Coach Assistant. Your role is to help users improve their interview skills...
-```
-
-This ensures responses are:
-- Professional and encouraging
-- Focused on interview preparation
-- Actionable and practical
-- Concise (2-3 paragraphs max)
-
-## 🎯 Next Steps
-
-1. **Add your OpenAI API key** to enable full AI functionality
-2. **Customize the system prompt** for your specific use case
-3. **Add rate limiting** for production use
-4. **Consider adding conversation memory** for context-aware responses
-
-Your AI Coach is ready to help users ace their interviews! 🎉
+Use `npm run test` and `npm run test:e2e` for isolated checks without paid provider calls. To verify a live integration, open the app, select **Ask your coach**, and send a question after configuring the key. Deployment-specific rate limits and persistent session infrastructure remain outside the local redesign.

@@ -1,15 +1,49 @@
-import { AlertTriangle, Bookmark, Briefcase, Clock, ExternalLink, GraduationCap, Rocket, Users } from "lucide-react";
+import { useState } from "react";
+import { apiRequest } from "@/lib/queryClient";
+import {
+  AlertTriangle,
+  Bookmark,
+  Briefcase,
+  Clock,
+  ExternalLink,
+  GraduationCap,
+  Rocket,
+  Users,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { NewsCategory, NewsItem } from "@/data/news";
 
-export const CATEGORY_META: Record<NewsCategory, { label: string; Icon: typeof Rocket; className: string }> = {
-  tech: { label: "Tech News", Icon: Rocket, className: "bg-blue-500/10 text-blue-600 border-blue-200" },
-  hiring: { label: "Hiring", Icon: Briefcase, className: "bg-green-500/10 text-green-600 border-green-200" },
-  layoffs: { label: "Layoffs", Icon: AlertTriangle, className: "bg-red-500/10 text-red-600 border-red-200" },
-  projects: { label: "Projects", Icon: Users, className: "bg-purple-500/10 text-purple-600 border-purple-200" },
-  internships: { label: "Internships", Icon: GraduationCap, className: "bg-yellow-500/10 text-yellow-600 border-yellow-200" },
+export const CATEGORY_META: Record<
+  NewsCategory,
+  { label: string; Icon: typeof Rocket; className: string }
+> = {
+  tech: {
+    label: "Tech News",
+    Icon: Rocket,
+    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+  },
+  hiring: {
+    label: "Hiring",
+    Icon: Briefcase,
+    className: "bg-green-500/10 text-green-600 border-green-200",
+  },
+  layoffs: {
+    label: "Layoffs",
+    Icon: AlertTriangle,
+    className: "bg-red-500/10 text-red-600 border-red-200",
+  },
+  projects: {
+    label: "Projects",
+    Icon: Users,
+    className: "bg-purple-500/10 text-purple-600 border-purple-200",
+  },
+  internships: {
+    label: "Internships",
+    Icon: GraduationCap,
+    className: "bg-yellow-500/10 text-yellow-600 border-yellow-200",
+  },
 };
 
 const MAX_TECH_BADGES = 3;
@@ -27,12 +61,38 @@ interface NewsCardProps {
   onToggleBookmark: () => void;
 }
 
-export default function NewsCard({ item, bookmarked, onToggleBookmark }: NewsCardProps) {
+export default function NewsCard({
+  item,
+  bookmarked,
+  onToggleBookmark,
+}: NewsCardProps) {
+  const [summary, setSummary] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const summarize = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await apiRequest("POST", "/api/news/summarize", {
+        content: `${item.title}\n${item.summary}`,
+      });
+      const result = await response.json();
+      if (result.source === "fallback")
+        throw new Error(
+          "AI summary is unavailable. The original excerpt is shown above.",
+        );
+      setSummary(result.summary);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Summary unavailable.");
+    } finally {
+      setBusy(false);
+    }
+  };
   const category = CATEGORY_META[item.category] ?? CATEGORY_META.tech;
   const { Icon } = category;
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+    <Card className="h-full hover:border-slate-300 transition-shadow duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <Badge className={`${category.className} border`}>
@@ -48,24 +108,68 @@ export default function NewsCard({ item, bookmarked, onToggleBookmark }: NewsCar
               aria-pressed={bookmarked}
               className="h-8 w-8 p-0"
             >
-              <Bookmark className={bookmarked ? "h-4 w-4 fill-current" : "h-4 w-4"} />
+              <Bookmark
+                className={bookmarked ? "h-4 w-4 fill-current" : "h-4 w-4"}
+              />
             </Button>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild>
-              <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Open article">
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </Button>
+            {item.url && (
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open article"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
           </div>
         </div>
-        <CardTitle className="text-lg line-clamp-2 leading-tight">{item.title}</CardTitle>
+        <CardTitle className="text-lg line-clamp-2 leading-tight">
+          {item.title}
+        </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
-        <p className="text-sm text-muted-foreground line-clamp-3">{item.summary}</p>
+        <p className="text-sm text-muted-foreground line-clamp-3">
+          {item.summary}
+        </p>
 
+        {item.url && (
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={summarize}
+              disabled={busy}
+            >
+              {busy
+                ? "Summarizing…"
+                : error
+                  ? "Retry summary"
+                  : "Summarize excerpt"}
+            </Button>
+            {summary && (
+              <p className="mt-3 rounded-lg bg-muted p-3 text-sm">
+                <span className="block text-xs font-medium mb-1">
+                  AI summary of this excerpt
+                </span>
+                {summary}
+              </p>
+            )}
+            {error && (
+              <p role="alert" className="text-sm text-destructive mt-2">
+                {error}
+              </p>
+            )}
+          </div>
+        )}
         {item.companyName && (
           <div className="flex items-center gap-2 text-sm">
             <span className="font-medium">{item.companyName}</span>
-            {item.location && <span className="text-muted-foreground">• {item.location}</span>}
+            {item.location && (
+              <span className="text-muted-foreground">• {item.location}</span>
+            )}
           </div>
         )}
 
@@ -87,7 +191,9 @@ export default function NewsCard({ item, bookmarked, onToggleBookmark }: NewsCar
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            {formatTimeAgo(item.publishedAt)}
+            {item.publishedAt
+              ? formatTimeAgo(item.publishedAt)
+              : "Sample article"}
           </span>
           <span>{item.source}</span>
         </div>

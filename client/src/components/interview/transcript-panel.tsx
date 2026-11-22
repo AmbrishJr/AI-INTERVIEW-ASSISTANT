@@ -10,7 +10,10 @@ interface TranscriptPanelProps {
   interim?: string;
 }
 
-export default function TranscriptPanel({ messages, interim }: TranscriptPanelProps) {
+export default function TranscriptPanel({
+  messages,
+  interim,
+}: TranscriptPanelProps) {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,8 +21,8 @@ export default function TranscriptPanel({ messages, interim }: TranscriptPanelPr
   }, [messages, interim]);
 
   return (
-    <Card className="bg-card/40 backdrop-blur-md border-white/5 h-64 md:h-72">
-      <div className="p-4 border-b border-white/5 bg-white/5">
+    <Card className="bg-card  border-border h-64 md:h-72">
+      <div className="p-4 border-b border-border bg-muted/50">
         <h3 className="font-heading font-semibold flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           Live Transcript
@@ -28,13 +31,19 @@ export default function TranscriptPanel({ messages, interim }: TranscriptPanelPr
       <ScrollArea className="p-4 h-[calc(100%-60px)]">
         <div className="space-y-4">
           {messages.map((msg, i) => (
-            <div key={i} className={cn("flex", msg.role === "ai" ? "justify-start" : "justify-end")}>
+            <div
+              key={i}
+              className={cn(
+                "flex",
+                msg.role === "ai" ? "justify-start" : "justify-end",
+              )}
+            >
               <div
                 className={cn(
                   "max-w-[85%] p-3 rounded-2xl text-sm",
                   msg.role === "ai"
-                    ? "bg-white/10 text-white rounded-tl-none"
-                    : "bg-primary/20 text-white border border-primary/20 rounded-tr-none",
+                    ? "bg-muted text-foreground rounded-tl-none"
+                    : "bg-primary/20 text-foreground border border-primary/20 rounded-tr-none",
                 )}
               >
                 {msg.text}
@@ -43,7 +52,7 @@ export default function TranscriptPanel({ messages, interim }: TranscriptPanelPr
           ))}
           {interim && (
             <div className="flex justify-end">
-              <div className="max-w-[85%] p-3 rounded-2xl rounded-tr-none text-sm border border-dashed border-primary/30 text-white/60 italic">
+              <div className="max-w-[85%] p-3 rounded-2xl rounded-tr-none text-sm border border-dashed border-primary/30 text-foreground/60 italic">
                 {interim}…
               </div>
             </div>

@@ -7,11 +7,12 @@ interface CacheItem<T> {
 class SimpleCache {
   private cache: Map<string, CacheItem<any>> = new Map();
 
-  set<T>(key: string, data: T, ttl: number = 5 * 60 * 1000): void { // Default 5 minutes
+  set<T>(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
+    // Default 5 minutes
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
@@ -36,20 +37,23 @@ class SimpleCache {
   cleanup(): void {
     const now = Date.now();
     const keysToDelete: string[] = [];
-    
+
     this.cache.forEach((item, key) => {
       if (now - item.timestamp > item.ttl) {
         keysToDelete.push(key);
       }
     });
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
+
+    keysToDelete.forEach((key) => this.cache.delete(key));
   }
 }
 
 export const newsCache = new SimpleCache();
 
 // Auto cleanup every 10 minutes
-setInterval(() => {
-  newsCache.cleanup();
-}, 10 * 60 * 1000);
+setInterval(
+  () => {
+    newsCache.cleanup();
+  },
+  10 * 60 * 1000,
+).unref();

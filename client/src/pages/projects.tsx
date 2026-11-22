@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FilterSelect, matchesQuery, SearchInput } from "@/components/common/filters";
+import {
+  FilterSelect,
+  matchesQuery,
+  SearchInput,
+} from "@/components/common/filters";
 import PageHeader from "@/components/common/page-header";
 import ProjectCard from "@/components/projects/project-card";
 import ResearchPapers from "@/components/projects/research-papers";
@@ -49,14 +53,18 @@ const SORTERS: Record<SortKey, (a: Project, b: Project) => number> = {
   trending: (a, b) => b.stars - a.stars,
   updated: (a, b) => a.updatedDaysAgo - b.updatedDaysAgo,
   forks: (a, b) => b.forks - a.forks,
-  beginner: (a, b) => DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty],
+  beginner: (a, b) =>
+    DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty],
 };
 
 export default function Projects() {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<(typeof CATEGORY_OPTIONS)[number]["value"]>("all");
-  const [difficulty, setDifficulty] = useState<(typeof DIFFICULTY_OPTIONS)[number]["value"]>("all");
-  const [authorType, setAuthorType] = useState<(typeof AUTHOR_OPTIONS)[number]["value"]>("all");
+  const [category, setCategory] =
+    useState<(typeof CATEGORY_OPTIONS)[number]["value"]>("all");
+  const [difficulty, setDifficulty] =
+    useState<(typeof DIFFICULTY_OPTIONS)[number]["value"]>("all");
+  const [authorType, setAuthorType] =
+    useState<(typeof AUTHOR_OPTIONS)[number]["value"]>("all");
   const [sortBy, setSortBy] = useState<SortKey>("trending");
   const bookmarks = useBookmarks("Project");
 
@@ -74,7 +82,14 @@ export default function Projects() {
 
   return (
     <div className="max-w-7xl mx-auto py-6 space-y-6">
-      <PageHeader title="Projects & Research" description="Discover innovative projects and cutting-edge research" />
+      <PageHeader
+        title="Something worth building"
+        description="Find project ideas and research to turn curiosity into experience."
+      />
+      <p className="rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
+        Sample catalog · Listings, counts, dates, and trends are illustrative
+        and are not updated live. Check the linked source for current details.
+      </p>
 
       <Tabs defaultValue="projects" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
@@ -84,19 +99,45 @@ export default function Projects() {
 
         <TabsContent value="projects" className="space-y-6">
           <Card>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-5 gap-4">
-              <SearchInput value={query} onChange={setQuery} placeholder="Search projects..." />
-              <FilterSelect value={category} onChange={setCategory} options={CATEGORY_OPTIONS} placeholder="Category" />
-              <FilterSelect value={difficulty} onChange={setDifficulty} options={DIFFICULTY_OPTIONS} placeholder="Difficulty" />
-              <FilterSelect value={authorType} onChange={setAuthorType} options={AUTHOR_OPTIONS} placeholder="Author Type" />
-              <FilterSelect value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} placeholder="Sort By" />
+            <CardContent className="p-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3">
+              <SearchInput
+                value={query}
+                onChange={setQuery}
+                placeholder="Search projects..."
+              />
+              <FilterSelect
+                value={category}
+                onChange={setCategory}
+                options={CATEGORY_OPTIONS}
+                placeholder="Category"
+              />
+              <FilterSelect
+                value={difficulty}
+                onChange={setDifficulty}
+                options={DIFFICULTY_OPTIONS}
+                placeholder="Difficulty"
+              />
+              <FilterSelect
+                value={authorType}
+                onChange={setAuthorType}
+                options={AUTHOR_OPTIONS}
+                placeholder="Author Type"
+              />
+              <FilterSelect
+                value={sortBy}
+                onChange={setSortBy}
+                options={SORT_OPTIONS}
+                placeholder="Sort By"
+              />
             </CardContent>
           </Card>
 
           {projects.length === 0 ? (
-            <p className="text-center text-muted-foreground py-12">No projects match your filters.</p>
+            <p className="text-center text-muted-foreground py-12">
+              No projects match your filters.
+            </p>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               <AnimatePresence>
                 {projects.map((project) => (
                   <motion.div

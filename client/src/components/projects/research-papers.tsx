@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ResearchPaper } from "@/data/projects";
 
-export default function ResearchPapers({ papers }: { papers: ResearchPaper[] }) {
+export default function ResearchPapers({
+  papers,
+}: {
+  papers: ResearchPaper[];
+}) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -29,16 +33,22 @@ export default function ResearchPapers({ papers }: { papers: ResearchPaper[] }) 
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-purple-900/20 rounded-lg">
-            <h4 className="font-semibold text-purple-100 mb-2">🔥 Trending Research Areas</h4>
-            <p className="text-sm text-purple-200">
-              Vision Transformers and Quantum ML are dominating recent publications with 40%+ growth.
+          <div className="p-4 bg-purple-50 rounded-lg">
+            <h4 className="font-semibold text-purple-800 mb-2">
+              🔥 Trending Research Areas
+            </h4>
+            <p className="text-sm text-purple-700">
+              Vision Transformers and Quantum ML are dominating recent
+              publications with 40%+ growth.
             </p>
           </div>
-          <div className="p-4 bg-blue-900/20 rounded-lg">
-            <h4 className="font-semibold text-blue-100 mb-2">📊 Industry Applications</h4>
-            <p className="text-sm text-blue-200">
-              Healthcare and finance sectors are leading in AI research adoption and funding.
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h4 className="font-semibold text-blue-800 mb-2">
+              📊 Industry Applications
+            </h4>
+            <p className="text-sm text-blue-700">
+              Healthcare and finance sectors are leading in AI research adoption
+              and funding.
             </p>
           </div>
         </CardContent>
@@ -70,7 +80,9 @@ function PaperCard({ paper }: { paper: ResearchPaper }) {
           <div>{new Date(paper.publishDate).toLocaleDateString()}</div>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{paper.abstract}</p>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+          {paper.abstract}
+        </p>
 
         {paper.keyFindings.length > 0 && (
           <div className="mb-4">

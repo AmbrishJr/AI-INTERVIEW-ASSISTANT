@@ -28,16 +28,22 @@ export default function MarketTrends({ trends }: { trends: JobTrend[] }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-blue-900/20 rounded-lg">
-            <h4 className="font-semibold text-blue-100 mb-2">🚀 High Growth Areas</h4>
-            <p className="text-sm text-blue-200">
-              AI/ML and DevOps roles showing 40%+ growth. Focus on cloud skills and automation tools.
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h4 className="font-semibold text-blue-800 mb-2">
+              🚀 High Growth Areas
+            </h4>
+            <p className="text-sm text-blue-700">
+              AI/ML and DevOps roles showing 40%+ growth. Focus on cloud skills
+              and automation tools.
             </p>
           </div>
-          <div className="p-4 bg-green-900/20 rounded-lg">
-            <h4 className="font-semibold text-green-100 mb-2">💡 Skill Recommendations</h4>
-            <p className="text-sm text-green-200">
-              Python, AWS, and Kubernetes appear in 70% of high-paying tech roles.
+          <div className="p-4 bg-green-50 rounded-lg">
+            <h4 className="font-semibold text-green-800 mb-2">
+              💡 Skill Recommendations
+            </h4>
+            <p className="text-sm text-green-700">
+              Python, AWS, and Kubernetes appear in 70% of high-paying tech
+              roles.
             </p>
           </div>
         </CardContent>

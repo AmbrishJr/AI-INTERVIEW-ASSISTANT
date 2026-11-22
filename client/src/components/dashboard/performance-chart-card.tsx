@@ -1,61 +1,109 @@
-import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import GlassCard from "@/components/common/glass-card";
+import { useMemo, useState } from "react";
+import {
+  Line,
+  LineChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-type Period = "weekly" | "monthly";
-
-const CHART_DATA: Record<Period, { name: string; score: number }[]> = {
-  weekly: [
-    { name: "Mon", score: 65 },
-    { name: "Tue", score: 72 },
-    { name: "Wed", score: 68 },
-    { name: "Thu", score: 85 },
-    { name: "Fri", score: 82 },
-    { name: "Sat", score: 90 },
-    { name: "Sun", score: 88 },
-  ],
-  monthly: [
-    { name: "W1", score: 70 },
-    { name: "W2", score: 76 },
-    { name: "W3", score: 81 },
-    { name: "W4", score: 85 },
-  ],
-};
-
-export default function PerformanceChartCard({ className }: { className?: string }) {
-  const [period, setPeriod] = useState<Period>("weekly");
-
+import { loadSessionHistory, type SessionRecord } from "@/lib/session-history";
+import { filterSessions, measured } from "@/lib/session-metrics";
+export default function PerformanceChartCard({
+  className,
+  sessions,
+}: {
+  className?: string;
+  sessions?: SessionRecord[];
+}) {
+  const [period, setPeriod] = useState("7d");
+  const data = useMemo(
+    () =>
+      filterSessions(sessions ?? loadSessionHistory(), period)
+        .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+        .map((s) => ({
+          date: new Date(s.date).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+          }),
+          camera: measured(s.metrics?.eyeContactPct, 100),
+        })),
+    [sessions, period],
+  );
   return (
-    <GlassCard className={className}>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Performance analytics preview</CardTitle>
-        <div className="flex gap-2">
-          {(["weekly", "monthly"] as const).map((p) => (
-            <Button key={p} size="sm" variant={period === p ? "default" : "outline"} onClick={() => setPeriod(p)} className="capitalize">
-              {p}
+    <Card className={className}>
+      <CardHeader className="flex sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <CardTitle>Camera presence over time</CardTitle>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Estimated time facing the camera during measured sessions.
+          </p>
+        </div>
+        <div className="flex gap-1">
+          {[
+            ["7d", "Week"],
+            ["30d", "Month"],
+          ].map(([value, label]) => (
+            <Button
+              key={value}
+              size="sm"
+              variant={period === value ? "secondary" : "ghost"}
+              onClick={() => setPeriod(value)}
+            >
+              {label}
             </Button>
           ))}
         </div>
       </CardHeader>
-      <CardContent className="h-[320px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={CHART_DATA[period]}>
-            <defs>
-              <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} />
-            <YAxis axisLine={false} tickLine={false} />
-            <Tooltip />
-            <Area type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorScore)" />
-          </AreaChart>
-        </ResponsiveContainer>
+      <CardContent>
+        {data.some((d) => d.camera !== null) ? (
+          <div
+            className="h-64"
+            role="img"
+            aria-label="Facing-camera percentage across saved sessions"
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  width={35}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  formatter={(value: number) => [`${value}%`, "Facing camera"]}
+                />
+                <Line
+                  dataKey="camera"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  connectNulls={false}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-64 flex flex-col items-center justify-center text-center rounded-lg bg-muted/40">
+            <p className="font-medium">Your progress starts with a session</p>
+            <p className="mt-2 text-sm text-muted-foreground max-w-xs">
+              Practice with the camera on to see measured camera presence here.
+            </p>
+          </div>
+        )}
       </CardContent>
-    </GlassCard>
+    </Card>
   );
 }

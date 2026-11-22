@@ -1,7 +1,13 @@
 import { useState } from "react";
 import InterviewRoom from "@/components/interview/interview-room";
-import PracticeSetup, { type PracticeSetupData } from "@/components/interview/practice-setup";
-import { generateQuestions, type Difficulty, type QuestionType } from "@/data/complete-questions-data";
+import PracticeSetup, {
+  type PracticeSetupData,
+} from "@/components/interview/practice-setup";
+import {
+  generateQuestions,
+  type Difficulty,
+  type QuestionType,
+} from "@/data/complete-questions-data";
 
 const QUESTIONS_PER_PRACTICE = 20;
 
@@ -34,7 +40,7 @@ export default function Practice() {
   return (
     <InterviewRoom
       questions={config.questions}
-      subtitle={`${config.selectedDomain} • ${config.questionType} • ${config.difficulty}`}
+      subtitle={`${config.selectedDomain} • ${config.experienceLevel} • ${config.questionType} • ${config.difficulty}`}
       exitLabel="Back to Setup"
       onExit={() => setConfig(null)}
     />

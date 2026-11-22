@@ -1,9 +1,10 @@
-import Groq from 'groq-sdk';
-import { AI_COMPLETION_OPTIONS, parseAIJson } from '../ai-config';
-import { newsCache } from './cacheService';
+import { createHash } from "node:crypto";
+import Groq from "groq-sdk";
+import { AI_COMPLETION_OPTIONS, parseAIJson } from "../ai-config";
+import { newsCache } from "./cacheService";
 
 interface InsightRequest {
-  type: 'trend' | 'summary' | 'recommendation' | 'prediction' | 'anomaly';
+  type: "trend" | "summary" | "recommendation" | "prediction" | "anomaly";
   data: any;
   context?: string;
   timeframe?: string;
@@ -11,11 +12,12 @@ interface InsightRequest {
 }
 
 interface InsightResponse {
+  source?: "ai" | "fallback";
   insights: Array<{
     type: string;
     title: string;
     description: string;
-    impact: 'high' | 'medium' | 'low';
+    impact: "high" | "medium" | "low";
     actionable: boolean;
     recommendation?: string;
     confidence: number;
@@ -29,10 +31,11 @@ interface InsightResponse {
 
 class AIInsightsEngine {
   private groq: Groq;
-  private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
+  private cache: Map<string, { data: any; timestamp: number; ttl: number }> =
+    new Map();
 
   constructor(apiKey: string) {
-    this.groq = new Groq({ apiKey });
+    this.groq = new Groq({ apiKey, timeout: 20000, maxRetries: 1 });
   }
 
   // Generate insights based on type and data
@@ -46,30 +49,47 @@ class AIInsightsEngine {
     let response: InsightResponse;
 
     switch (request.type) {
-      case 'trend':
-        response = await this.analyzeTrends(request.data, request.context, request.timeframe);
+      case "trend":
+        response = await this.analyzeTrends(
+          request.data,
+          request.context,
+          request.timeframe,
+        );
         break;
-      case 'summary':
+      case "summary":
         response = await this.generateSummary(request.data, request.context);
         break;
-      case 'recommendation':
-        response = await this.generateRecommendations(request.data, request.preferences);
+      case "recommendation":
+        response = await this.generateRecommendations(
+          request.data,
+          request.preferences,
+        );
         break;
-      case 'prediction':
-        response = await this.generatePredictions(request.data, request.timeframe);
+      case "prediction":
+        response = await this.generatePredictions(
+          request.data,
+          request.timeframe,
+        );
         break;
-      case 'anomaly':
+      case "anomaly":
         response = await this.detectAnomalies(request.data, request.context);
         break;
       default:
-        response = await this.generateGeneralInsights(request.data, request.context);
+        response = await this.generateGeneralInsights(
+          request.data,
+          request.context,
+        );
     }
 
     this.setCache(cacheKey, response, 5 * 60 * 1000); // 5 minutes cache
     return response;
   }
 
-  private async analyzeTrends(data: any, context?: string, timeframe?: string): Promise<InsightResponse> {
+  private async analyzeTrends(
+    data: any,
+    context?: string,
+    timeframe?: string,
+  ): Promise<InsightResponse> {
     const systemPrompt = `You are an AI trend analyst for a tech intelligence platform. Analyze the provided data and identify meaningful trends.
 
 Focus on:
@@ -103,12 +123,15 @@ Return JSON format:
   }
 }`;
 
-    const userPrompt = `Analyze tech trends in this data for ${timeframe || 'recent period'}: ${JSON.stringify(data)}. Context: ${context || 'General tech intelligence'}`;
+    const userPrompt = `Analyze tech trends in this data for ${timeframe || "recent period"}: ${JSON.stringify(data)}. Context: ${context || "General tech intelligence"}`;
 
     return this.callAI(systemPrompt, userPrompt);
   }
 
-  private async generateSummary(data: any, context?: string): Promise<InsightResponse> {
+  private async generateSummary(
+    data: any,
+    context?: string,
+  ): Promise<InsightResponse> {
     const systemPrompt = `You are an AI content summarizer for a tech intelligence platform. Create concise, insightful summaries.
 
 Focus on:
@@ -133,12 +156,15 @@ Return JSON format:
   ]
 }`;
 
-    const userPrompt = `Summarize this tech data: ${JSON.stringify(data)}. Context: ${context || 'Tech intelligence summary'}`;
+    const userPrompt = `Summarize this tech data: ${JSON.stringify(data)}. Context: ${context || "Tech intelligence summary"}`;
 
     return this.callAI(systemPrompt, userPrompt);
   }
 
-  private async generateRecommendations(data: any, preferences?: any): Promise<InsightResponse> {
+  private async generateRecommendations(
+    data: any,
+    preferences?: any,
+  ): Promise<InsightResponse> {
     const systemPrompt = `You are an AI recommendation engine for tech professionals. Generate personalized, actionable recommendations.
 
 Consider:
@@ -169,7 +195,10 @@ Return JSON format:
     return this.callAI(systemPrompt, userPrompt);
   }
 
-  private async generatePredictions(data: any, timeframe?: string): Promise<InsightResponse> {
+  private async generatePredictions(
+    data: any,
+    timeframe?: string,
+  ): Promise<InsightResponse> {
     const systemPrompt = `You are an AI prediction engine for tech trends. Generate realistic, data-driven predictions.
 
 Focus on:
@@ -206,12 +235,15 @@ Return JSON format:
   ]
 }`;
 
-    const userPrompt = `Generate predictions for ${timeframe || 'next week'} based on: ${JSON.stringify(data)}`;
+    const userPrompt = `Generate predictions for ${timeframe || "next week"} based on: ${JSON.stringify(data)}`;
 
     return this.callAI(systemPrompt, userPrompt);
   }
 
-  private async detectAnomalies(data: any, context?: string): Promise<InsightResponse> {
+  private async detectAnomalies(
+    data: any,
+    context?: string,
+  ): Promise<InsightResponse> {
     const systemPrompt = `You are an AI anomaly detection system for tech intelligence. Identify unusual patterns and outliers.
 
 Look for:
@@ -244,12 +276,15 @@ Return JSON format:
   ]
 }`;
 
-    const userPrompt = `Detect anomalies in this data: ${JSON.stringify(data)}. Context: ${context || 'Tech platform analytics'}`;
+    const userPrompt = `Detect anomalies in this data: ${JSON.stringify(data)}. Context: ${context || "Tech platform analytics"}`;
 
     return this.callAI(systemPrompt, userPrompt);
   }
 
-  private async generateGeneralInsights(data: any, context?: string): Promise<InsightResponse> {
+  private async generateGeneralInsights(
+    data: any,
+    context?: string,
+  ): Promise<InsightResponse> {
     const systemPrompt = `You are an AI insights engine for a tech intelligence platform. Generate meaningful insights from any data.
 
 Focus on:
@@ -274,54 +309,60 @@ Return JSON format:
   ]
 }`;
 
-    const userPrompt = `Generate insights from: ${JSON.stringify(data)}. Context: ${context || 'Tech intelligence'}`;
+    const userPrompt = `Generate insights from: ${JSON.stringify(data)}. Context: ${context || "Tech intelligence"}`;
 
     return this.callAI(systemPrompt, userPrompt);
   }
 
-  private async callAI(systemPrompt: string, userPrompt: string): Promise<InsightResponse> {
+  private async callAI(
+    systemPrompt: string,
+    userPrompt: string,
+  ): Promise<InsightResponse> {
     try {
       const completion = await this.groq.chat.completions.create({
         ...AI_COMPLETION_OPTIONS,
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: userPrompt },
         ],
         max_tokens: 800,
         temperature: 0.3,
       });
 
-      const aiResponse = completion.choices[0]?.message?.content || '{}';
-      
+      const aiResponse = completion.choices[0]?.message?.content || "{}";
+
       try {
         return parseAIJson(aiResponse);
       } catch (parseError) {
-        console.error('Failed to parse AI response:', parseError);
+        console.error("Failed to parse AI response:", parseError);
         return this.getFallbackResponse();
       }
     } catch (error) {
-      console.error('AI call failed:', error);
+      console.error("AI call failed:", error);
       return this.getFallbackResponse();
     }
   }
 
   private getFallbackResponse(): InsightResponse {
     return {
-      insights: [{
-        type: 'general',
-        title: 'Analysis Limited',
-        description: 'Unable to generate detailed insights at this time.',
-        impact: 'low',
-        actionable: false,
-        recommendation: 'Please try again later.',
-        confidence: 50
-      }],
-      summary: 'Basic analysis available'
+      source: "fallback",
+      insights: [
+        {
+          type: "general",
+          title: "Analysis Limited",
+          description: "Unable to generate detailed insights at this time.",
+          impact: "low",
+          actionable: false,
+          recommendation: "Please try again later.",
+          confidence: 0,
+        },
+      ],
+      summary: "Basic analysis available",
     };
   }
 
   private generateCacheKey(request: InsightRequest): string {
-    return `${request.type}_${JSON.stringify(request.data).slice(0, 100)}_${request.context || ''}_${request.timeframe || ''}`;
+    return createHash("sha256").update(JSON.stringify(request)).digest("hex");
   }
 
   private getFromCache(key: string): InsightResponse | null {
@@ -339,7 +380,7 @@ Return JSON format:
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
@@ -347,14 +388,14 @@ Return JSON format:
   cleanupCache(): void {
     const now = Date.now();
     const keysToDelete: string[] = [];
-    
+
     this.cache.forEach((value, key) => {
       if (now - value.timestamp > value.ttl) {
         keysToDelete.push(key);
       }
     });
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
+
+    keysToDelete.forEach((key) => this.cache.delete(key));
   }
 }
 
@@ -363,15 +404,18 @@ let aiInsightsEngine: AIInsightsEngine | null = null;
 
 export function getAIInsightsEngine(): AIInsightsEngine {
   if (!aiInsightsEngine) {
-    const apiKey = process.env.GROQ_API_KEY || 'your-groq-api-key-here';
+    const apiKey = process.env.GROQ_API_KEY || "your-groq-api-key-here";
     aiInsightsEngine = new AIInsightsEngine(apiKey);
-    
+
     // Cleanup cache every 10 minutes
-    setInterval(() => {
-      aiInsightsEngine?.cleanupCache();
-    }, 10 * 60 * 1000);
+    setInterval(
+      () => {
+        aiInsightsEngine?.cleanupCache();
+      },
+      10 * 60 * 1000,
+    ).unref();
   }
-  
+
   return aiInsightsEngine;
 }
 

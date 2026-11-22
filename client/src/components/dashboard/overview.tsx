@@ -1,5 +1,15 @@
 import { useLocation } from "wouter";
-import { Activity, BarChart3, CheckCircle, Download, Play, RefreshCw, Target, TrendingUp, Zap } from "lucide-react";
+import {
+  Activity,
+  BarChart3,
+  CheckCircle,
+  Download,
+  Play,
+  RefreshCw,
+  Target,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import GlassCard from "@/components/common/glass-card";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +24,15 @@ export function WelcomeCard({ onRefresh }: { onRefresh: () => void }) {
         <div>
           <CardTitle>Welcome back, {profileName}</CardTitle>
           <div className="text-sm text-muted-foreground mt-1">
-            Keep the streak alive—small sessions daily beat long sessions rarely.
+            A short session is a useful step forward.
           </div>
         </div>
-        <Button variant="outline" size="sm" className="gap-2" onClick={onRefresh}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={onRefresh}
+        >
           <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
@@ -29,8 +44,16 @@ export function WelcomeCard({ onRefresh }: { onRefresh: () => void }) {
 export function StatCards({ totals }: { totals: DashboardTotals }) {
   const stats = [
     { title: "Total Sessions", value: totals.totalSessions, Icon: Activity },
-    { title: "Completed Sessions", value: totals.completedSessions, Icon: CheckCircle },
-    { title: "Average Focus Score", value: totals.avgFocus, Icon: TrendingUp },
+    {
+      title: "Completed Sessions",
+      value: totals.completedSessions,
+      Icon: CheckCircle,
+    },
+    {
+      title: "Facing camera",
+      value: totals.avgFocus === null ? "—" : `${totals.avgFocus}%`,
+      Icon: TrendingUp,
+    },
     { title: "Active Streak (days)", value: totals.streakDays, Icon: Zap },
   ];
 
@@ -58,7 +81,10 @@ interface QuickActionsCardProps {
   onExport: () => void;
 }
 
-export function QuickActionsCard({ onCreateGoal, onExport }: QuickActionsCardProps) {
+export function QuickActionsCard({
+  onCreateGoal,
+  onExport,
+}: QuickActionsCardProps) {
   const [, setLocation] = useLocation();
   return (
     <GlassCard>
@@ -67,12 +93,20 @@ export function QuickActionsCard({ onCreateGoal, onExport }: QuickActionsCardPro
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
         <Button className="gap-2" onClick={() => setLocation("/session")}>
-          <Play className="h-4 w-4" /> Start New Session
+          <Play className="h-4 w-4" /> Quick session
         </Button>
-        <Button variant="outline" className="gap-2" onClick={() => setLocation("/practice")}>
-          <Target className="h-4 w-4" /> Guided Practice
+        <Button
+          variant="outline"
+          className="gap-2"
+          onClick={() => setLocation("/practice")}
+        >
+          <Target className="h-4 w-4" /> Guided practice
         </Button>
-        <Button variant="outline" className="gap-2" onClick={() => setLocation("/analytics")}>
+        <Button
+          variant="outline"
+          className="gap-2"
+          onClick={() => setLocation("/analytics")}
+        >
           <BarChart3 className="h-4 w-4" /> View Analytics
         </Button>
         <Button variant="outline" className="gap-2" onClick={onCreateGoal}>

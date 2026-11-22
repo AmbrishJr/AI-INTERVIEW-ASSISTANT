@@ -1,28 +1,42 @@
 import { useCallback, useState } from "react";
+import { readLocal, writeLocal } from "@/lib/local-data";
+import { useAuth } from "@/contexts/auth-context";
 import { toastInfo } from "@/hooks/use-toast";
-
-/** Toggleable set of bookmarked ids with a toast on each change. */
 export function useBookmarks(itemNoun: string) {
-  const [ids, setIds] = useState<Set<string>>(() => new Set());
-
+  const { user } = useAuth();
+  const key = `bookmarks:${itemNoun}`;
+  const read = () => {
+    try {
+      const value = JSON.parse(readLocal(key) ?? "[]");
+      return new Set<string>(
+        Array.isArray(value) ? value.filter((v) => typeof v === "string") : [],
+      );
+    } catch {
+      return new Set<string>();
+    }
+  };
+  const [state, setState] = useState(() => ({ owner: user?.id, ids: read() }));
+  const ids = state.owner === user?.id ? state.ids : read();
+  if (state.owner !== user?.id) setState({ owner: user?.id, ids });
   const toggle = useCallback(
     (id: string) => {
-      const wasSaved = ids.has(id);
-      setIds((prev) => {
-        const next = new Set(prev);
-        if (wasSaved) next.delete(id);
-        else next.add(id);
-        return next;
-      });
+      const next = new Set(ids);
+      const saved = next.has(id);
+      saved ? next.delete(id) : next.add(id);
+      const durable = writeLocal(key, JSON.stringify([...next]));
+      setState({ owner: user?.id, ids: next });
       toastInfo(
-        wasSaved ? "Removed" : "Saved",
-        wasSaved ? `${itemNoun} removed from bookmarks` : `${itemNoun} added to bookmarks`,
+        durable
+          ? saved
+            ? "Bookmark removed"
+            : "Bookmarked"
+          : "Saved for this visit only",
+        durable
+          ? `${itemNoun} ${saved ? "removed" : "saved in this browser"}.`
+          : "Browser storage is unavailable.",
       );
     },
-    [ids, itemNoun],
+    [ids, key, itemNoun, user?.id],
   );
-
-  const isBookmarked = useCallback((id: string) => ids.has(id), [ids]);
-
-  return { isBookmarked, toggle, count: ids.size };
+  return { isBookmarked: (id: string) => ids.has(id), toggle, count: ids.size };
 }

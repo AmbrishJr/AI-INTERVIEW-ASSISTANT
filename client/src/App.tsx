@@ -1,7 +1,8 @@
+import { useGuardedLocation } from "@/lib/guarded-location";
 import { lazy, Suspense, type ComponentType } from "react";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +10,10 @@ import { AuthProvider } from "@/contexts/auth-context";
 import AppLayout from "@/components/layout/app-layout";
 import RequireAuth from "@/components/layout/require-auth";
 import ErrorBoundary from "@/components/layout/error-boundary";
-import { GlobalLoadingIndicator, PageLoader } from "@/components/layout/loading-indicators";
+import {
+  GlobalLoadingIndicator,
+  PageLoader,
+} from "@/components/layout/loading-indicators";
 import AIChatbot from "@/components/chatbot/ai-chatbot";
 
 const Home = lazy(() => import("@/pages/home"));
@@ -57,42 +61,36 @@ function Router() {
   const [location] = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.18, ease: "easeOut" }}
-      >
-        <Suspense fallback={<PageLoader />}>
-          <Switch>
-            {ROUTES.map((route) => (
-              <Route key={route.path} path={route.path}>
-                {renderRoute(route)}
-              </Route>
-            ))}
-            <Route component={NotFound} />
-          </Switch>
-        </Suspense>
-      </motion.div>
-    </AnimatePresence>
+    <Suspense fallback={<PageLoader />}>
+      <Switch>
+        {ROUTES.map((route) => (
+          <Route key={route.path} path={route.path}>
+            {renderRoute(route)}
+          </Route>
+        ))}
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <GlobalLoadingIndicator />
-          <ErrorBoundary>
-            <Router />
-          </ErrorBoundary>
-          <AIChatbot />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <WouterRouter hook={useGuardedLocation}>
+      <MotionConfig reducedMotion="user">
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <GlobalLoadingIndicator />
+              <ErrorBoundary>
+                <Router />
+              </ErrorBoundary>
+              <AIChatbot />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </AuthProvider>
+      </MotionConfig>
+    </WouterRouter>
   );
 }

@@ -5,18 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 /** Fades content up the first time it scrolls into view. */
-export function Reveal({ delay = 0, className, children }: { delay?: number; className?: string; children: ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay }}
-      viewport={{ once: true }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+export function Reveal({
+  delay = 0,
+  className,
+  children,
+}: {
+  delay?: number;
+  className?: string;
+  children: ReactNode;
+}) {
+  return <div className={className}>{children}</div>;
 }
 
 interface SectionProps {
@@ -28,7 +26,13 @@ interface SectionProps {
 }
 
 /** Landing page section with an optional centered heading. */
-export function Section({ title, subtitle, className, ref, children }: SectionProps) {
+export function Section({
+  title,
+  subtitle,
+  className,
+  ref,
+  children,
+}: SectionProps) {
   return (
     <section ref={ref} className={cn("py-16 bg-background", className)}>
       <div className="max-w-7xl mx-auto px-6">
@@ -45,7 +49,13 @@ export function Section({ title, subtitle, className, ref, children }: SectionPr
 }
 
 /** Card whose body expands/collapses when the header is clicked. */
-export function ExpandableCard({ header, children }: { header: ReactNode; children: ReactNode }) {
+export function ExpandableCard({
+  header,
+  children,
+}: {
+  header: ReactNode;
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -58,7 +68,12 @@ export function ExpandableCard({ header, children }: { header: ReactNode; childr
           onClick={() => setOpen((o) => !o)}
         >
           <div className="flex-1">{header}</div>
-          <ChevronDown className={cn("h-5 w-5 shrink-0 transition-transform", open && "rotate-180")} />
+          <ChevronDown
+            className={cn(
+              "h-5 w-5 shrink-0 transition-transform",
+              open && "rotate-180",
+            )}
+          />
         </button>
         <AnimatePresence initial={false}>
           {open && (

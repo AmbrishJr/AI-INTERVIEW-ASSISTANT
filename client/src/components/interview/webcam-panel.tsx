@@ -1,6 +1,18 @@
 import { useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { AlertTriangle, CheckCircle, Loader2, Mic, MicOff, Play, ScanFace, Square, Users, Video, VideoOff } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Loader2,
+  Mic,
+  MicOff,
+  Play,
+  ScanFace,
+  Square,
+  Users,
+  Video,
+  VideoOff,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { FaceAnalysis, FaceIssue } from "@/hooks/use-face-detection";
@@ -55,12 +67,15 @@ export default function WebcamPanel({
     onToggleCam();
   };
 
-  const showFaceAlert = camOn && camReady && (face.status === "no-face" || face.status === "multiple-faces");
+  const showFaceAlert =
+    camOn &&
+    camReady &&
+    (face.status === "no-face" || face.status === "multiple-faces");
 
   return (
     <div
       className={cn(
-        "relative rounded-2xl overflow-hidden bg-black border shadow-2xl min-h-[400px] transition-colors",
+        "relative rounded-2xl overflow-hidden bg-black border aspect-video min-h-[280px] transition-colors",
         showFaceAlert ? "border-red-500/70" : "border-white/10",
       )}
     >
@@ -68,7 +83,7 @@ export default function WebcamPanel({
         <Webcam
           key={camKey}
           ref={webcamRef}
-          className="w-full h-full object-cover opacity-90"
+          className="absolute inset-0 w-full h-full object-cover"
           audio={false}
           mirrored
           videoConstraints={{ facingMode: "user" }}
@@ -85,7 +100,7 @@ export default function WebcamPanel({
           }}
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-zinc-900 min-h-[400px]">
+        <div className="w-full h-full flex items-center justify-center bg-zinc-900 min-h-[280px]">
           <VideoOff className="w-16 h-16 text-zinc-700" />
         </div>
       )}
@@ -102,23 +117,31 @@ export default function WebcamPanel({
       {camOn && camError && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-6">
           <div className="max-w-md w-full rounded-xl border border-white/10 bg-zinc-900/80 backdrop-blur p-4 text-center">
-            <div className="text-sm font-medium text-white mb-1">Camera not available</div>
+            <div className="text-sm font-medium text-white mb-1">
+              Camera not available
+            </div>
             <div className="text-xs text-white/70 mb-3">{camError}</div>
             <div className="text-xs text-white/60 mb-4">
-              Allow camera permission for this site (browser address bar) and try again.
+              Allow camera permission for this site (browser address bar) and
+              try again.
             </div>
-            <Button variant="outline" size="sm" className="border-white/10 hover:bg-white/5" onClick={restartCamera}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-white/20 bg-white text-slate-900 hover:bg-slate-100"
+              onClick={restartCamera}
+            >
               Retry
             </Button>
           </div>
         </div>
       )}
 
-      {isActive && camOn && face.status === "ok" && <ScanOverlay />}
-
       {camOn && camReady && <FaceStatusBadge face={face} />}
 
-      {showFaceAlert && <FaceAlert multiple={face.status === "multiple-faces"} />}
+      {showFaceAlert && (
+        <FaceAlert multiple={face.status === "multiple-faces"} />
+      )}
 
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center gap-4">
         <Button
@@ -136,7 +159,7 @@ export default function WebcamPanel({
           variant={isActive ? "destructive" : "default"}
           size="lg"
           className={cn(
-            "rounded-full px-8 font-semibold shadow-[0_0_20px_rgba(0,240,255,0.3)]",
+            "rounded-lg px-6 font-medium",
             isActive
               ? "bg-red-500 hover:bg-red-600 shadow-red-500/30"
               : "bg-primary hover:bg-primary/90 text-primary-foreground",
@@ -162,7 +185,11 @@ export default function WebcamPanel({
           aria-label={camOn ? "Turn camera off" : "Turn camera on"}
           aria-pressed={!camOn}
         >
-          {camOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+          {camOn ? (
+            <Video className="w-5 h-5" />
+          ) : (
+            <VideoOff className="w-5 h-5" />
+          )}
         </Button>
       </div>
     </div>
@@ -173,17 +200,41 @@ function FaceStatusBadge({ face }: { face: FaceAnalysis }) {
   const { label, className, Icon } = (() => {
     switch (face.status) {
       case "loading":
-        return { label: "Starting face detection…", className: "bg-black/60 text-white/80", Icon: Loader2 };
+        return {
+          label: "Starting face detection…",
+          className: "bg-black/60 text-white/80",
+          Icon: Loader2,
+        };
       case "unavailable":
-        return { label: "Face detection unavailable", className: "bg-yellow-500/20 text-yellow-200", Icon: AlertTriangle };
+        return {
+          label: "Face detection unavailable",
+          className: "bg-yellow-500/20 text-yellow-200",
+          Icon: AlertTriangle,
+        };
       case "no-face":
-        return { label: "No face detected", className: "bg-red-500/30 text-red-100", Icon: AlertTriangle };
+        return {
+          label: "No face detected",
+          className: "bg-red-500/30 text-red-100",
+          Icon: AlertTriangle,
+        };
       case "multiple-faces":
-        return { label: "Multiple faces", className: "bg-red-500/30 text-red-100", Icon: Users };
+        return {
+          label: "Multiple faces",
+          className: "bg-red-500/30 text-red-100",
+          Icon: Users,
+        };
       case "ok":
         return face.issues.length
-          ? { label: face.issues.map((i) => ISSUE_LABELS[i]).join(" · "), className: "bg-yellow-500/25 text-yellow-100", Icon: ScanFace }
-          : { label: "Face detected", className: "bg-green-500/25 text-green-100", Icon: CheckCircle };
+          ? {
+              label: face.issues.map((i) => ISSUE_LABELS[i]).join(" · "),
+              className: "bg-yellow-500/25 text-yellow-100",
+              Icon: ScanFace,
+            }
+          : {
+              label: "Face detected",
+              className: "bg-green-500/25 text-green-100",
+              Icon: CheckCircle,
+            };
       default:
         return { label: "", className: "", Icon: ScanFace };
     }
@@ -194,9 +245,17 @@ function FaceStatusBadge({ face }: { face: FaceAnalysis }) {
     <div
       role="status"
       aria-live="polite"
-      className={cn("absolute top-4 left-4 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium backdrop-blur", className)}
+      className={cn(
+        "absolute top-4 left-4 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium backdrop-blur",
+        className,
+      )}
     >
-      <Icon className={cn("w-3.5 h-3.5", face.status === "loading" && "animate-spin")} />
+      <Icon
+        className={cn(
+          "w-3.5 h-3.5",
+          face.status === "loading" && "animate-spin",
+        )}
+      />
       {label}
     </div>
   );
@@ -205,7 +264,10 @@ function FaceStatusBadge({ face }: { face: FaceAnalysis }) {
 function FaceAlert({ multiple }: { multiple: boolean }) {
   return (
     <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center px-6 pointer-events-none">
-      <div role="alert" className="max-w-sm rounded-xl border border-red-500/40 bg-red-950/80 backdrop-blur px-4 py-3 text-center">
+      <div
+        role="alert"
+        className="max-w-sm rounded-xl border border-red-500/40 bg-red-950/80 backdrop-blur px-4 py-3 text-center"
+      >
         <div className="flex items-center justify-center gap-2 text-sm font-semibold text-red-100">
           <AlertTriangle className="w-4 h-4" />
           {multiple ? "More than one face detected" : "Face not detected"}
@@ -216,18 +278,6 @@ function FaceAlert({ multiple }: { multiple: boolean }) {
             : "Make sure your face is fully visible, well lit and centered in the frame."}
         </p>
       </div>
-    </div>
-  );
-}
-
-function ScanOverlay() {
-  return (
-    <div className="absolute inset-0 pointer-events-none">
-      <div className="w-full h-[2px] bg-primary/50 absolute top-0 animate-[scan_3s_linear_infinite] shadow-[0_0_10px_var(--color-primary)]" />
-      <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-primary/50" />
-      <div className="absolute top-8 right-8 w-12 h-12 border-t-2 border-r-2 border-primary/50" />
-      <div className="absolute bottom-8 left-8 w-12 h-12 border-b-2 border-l-2 border-primary/50" />
-      <div className="absolute bottom-8 right-8 w-12 h-12 border-b-2 border-r-2 border-primary/50" />
     </div>
   );
 }

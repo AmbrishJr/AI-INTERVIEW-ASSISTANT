@@ -1,9 +1,22 @@
-import { BookOpen, Building, ExternalLink, GitBranch, GraduationCap, Rocket, Star } from "lucide-react";
+import {
+  BookOpen,
+  Building,
+  ExternalLink,
+  GitBranch,
+  GraduationCap,
+  Rocket,
+  Star,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDaysAgo } from "@/lib/format";
-import type { AuthorType, Project, ProjectCategory, ProjectDifficulty } from "@/data/projects";
+import type {
+  AuthorType,
+  Project,
+  ProjectCategory,
+  ProjectDifficulty,
+} from "@/data/projects";
 
 const CATEGORY_STYLES: Record<ProjectCategory, string> = {
   ai: "bg-purple-100 text-purple-800",
@@ -35,25 +48,38 @@ interface ProjectCardProps {
   onToggleBookmark: () => void;
 }
 
-export default function ProjectCard({ project, bookmarked, onToggleBookmark }: ProjectCardProps) {
+export default function ProjectCard({
+  project,
+  bookmarked,
+  onToggleBookmark,
+}: ProjectCardProps) {
   const AuthorIcon = AUTHOR_ICONS[project.authorType];
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
+    <Card className="h-full hover:border-slate-300 transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <AuthorIcon className="h-4 w-4 text-muted-foreground" aria-label={project.authorType} />
-              <Badge variant="outline" className={CATEGORY_STYLES[project.category]}>
+              <AuthorIcon
+                className="h-4 w-4 text-muted-foreground"
+                aria-label={project.authorType}
+              />
+              <Badge
+                variant="outline"
+                className={CATEGORY_STYLES[project.category]}
+              >
                 {project.category}
               </Badge>
-              <Badge variant="outline" className={DIFFICULTY_STYLES[project.difficulty]}>
+              <Badge
+                variant="outline"
+                className={DIFFICULTY_STYLES[project.difficulty]}
+              >
                 {project.difficulty}
               </Badge>
             </div>
             <h3 className="text-lg font-semibold mb-1">{project.name}</h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
               <span>{project.author}</span>
               <span aria-hidden>•</span>
               <span>{project.language}</span>
@@ -73,7 +99,9 @@ export default function ProjectCard({ project, bookmarked, onToggleBookmark }: P
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+          {project.description}
+        </p>
 
         <div className="flex flex-wrap gap-1 mb-4">
           {project.techStack.slice(0, MAX_TECH_BADGES).map((tech) => (
@@ -100,11 +128,17 @@ export default function ProjectCard({ project, bookmarked, onToggleBookmark }: P
         </div>
 
         {project.learningOutcomes.length > 0 && (
-          <div className="p-3 bg-blue-900/20 rounded-lg mb-4">
-            <div className="text-sm font-medium text-blue-100 mb-1">🎯 What you'll learn</div>
+          <div className="p-3 bg-blue-50 rounded-lg mb-4">
+            <div className="text-sm font-medium text-blue-800 mb-1">
+              What you’ll learn
+            </div>
             <div className="flex flex-wrap gap-1">
               {project.learningOutcomes.slice(0, 3).map((outcome) => (
-                <Badge key={outcome} variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                <Badge
+                  key={outcome}
+                  variant="secondary"
+                  className="text-xs bg-blue-100 text-blue-800"
+                >
                   {outcome}
                 </Badge>
               ))}

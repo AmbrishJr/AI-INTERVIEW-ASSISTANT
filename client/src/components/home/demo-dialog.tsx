@@ -1,42 +1,71 @@
 import { useState } from "react";
-import { BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
-const PREVIEWS = ["dashboard", "analytics", "session"] as const;
-
-export default function DemoDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const [active, setActive] = useState<(typeof PREVIEWS)[number]>("dashboard");
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ProductPreview } from "./hero-section";
+export default function DemoDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [tab, setTab] = useState("Practice");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-xl max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Live Platform Preview</DialogTitle>
-          <DialogDescription>Explore a static preview of the dashboard, analytics, and session timer experience.</DialogDescription>
+          <DialogTitle>A look inside your workspace</DialogTitle>
+          <DialogDescription>
+            Illustrative previews. Your workspace starts with your own data.
+          </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            {PREVIEWS.map((preview) => (
-              <Button
-                key={preview}
-                variant={active === preview ? "default" : "outline"}
-                onClick={() => setActive(preview)}
-                className="capitalize"
-              >
-                {preview}
-              </Button>
-            ))}
-          </div>
-
-          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-              <p className="text-muted-foreground capitalize">{active} Preview</p>
+        <div className="flex gap-2">
+          {["Practice", "Overview", "Progress"].map((t) => (
+            <Button
+              key={t}
+              size="sm"
+              variant={t === tab ? "default" : "outline"}
+              onClick={() => setTab(t)}
+            >
+              {t}
+            </Button>
+          ))}
+        </div>
+        {tab === "Practice" ? (
+          <ProductPreview />
+        ) : (
+          <div className="border rounded-xl p-6 space-y-4">
+            <h3 className="text-lg font-semibold">
+              {tab === "Overview"
+                ? "A clear next step"
+                : "Progress you can understand"}
+            </h3>
+            <p className="text-muted-foreground">
+              {tab === "Overview"
+                ? "Start a practice session, set a daily goal, and revisit your recent sessions from one place."
+                : "See speaking pace, camera presence, and time spent practicing. Missing measurements stay clearly marked."}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {(tab === "Overview"
+                ? ["Recent sessions", "Daily goals"]
+                : ["Speaking pace", "Camera presence"]
+              ).map((t) => (
+                <div className="rounded-lg bg-muted p-4" key={t}>
+                  <p className="text-sm font-medium">{t}</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Your data appears here
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

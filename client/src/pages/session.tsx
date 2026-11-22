@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Settings2 } from "lucide-react";
-import DifficultySelector, { type Difficulty, type QuestionType } from "@/components/interview/difficulty-selector";
+import DifficultySelector, {
+  type Difficulty,
+  type QuestionType,
+} from "@/components/interview/difficulty-selector";
 import InterviewRoom from "@/components/interview/interview-room";
 import PanelCard from "@/components/interview/panel-card";
 import { QUICK_SESSION_QUESTIONS } from "@/data/quick-session-questions";
@@ -19,7 +22,10 @@ export default function Session() {
       exitLabel="Back"
       onExit={() => setLocation("/")}
       settingsPanel={
-        <PanelCard icon={<Settings2 className="w-4 h-4 text-blue-400" />} title="Interview Settings">
+        <PanelCard
+          icon={<Settings2 className="w-4 h-4 text-blue-700" />}
+          title="Interview Settings"
+        >
           <DifficultySelector
             difficulty={difficulty}
             questionType={questionType}

@@ -1,3 +1,4 @@
+import "dotenv/config";
 /**
  * Shared Groq chat-completion settings. Override the model with GROQ_MODEL in .env
  * (list available models: GET https://api.groq.com/openai/v1/models).
@@ -15,13 +16,16 @@ export const AI_COMPLETION_OPTIONS = {
  * Throws if no JSON object can be found, so callers keep their existing fallbacks.
  */
 export function parseAIJson<T = any>(reply: string): T {
-  const unfenced = reply.replace(/^\s*```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
+  const unfenced = reply
+    .replace(/^\s*```(?:json)?\s*/i, "")
+    .replace(/\s*```\s*$/, "");
   try {
     return JSON.parse(unfenced);
   } catch {
     const start = unfenced.indexOf("{");
     const end = unfenced.lastIndexOf("}");
-    if (start === -1 || end <= start) throw new SyntaxError("No JSON object in AI reply");
+    if (start === -1 || end <= start)
+      throw new SyntaxError("No JSON object in AI reply");
     return JSON.parse(unfenced.slice(start, end + 1));
   }
 }

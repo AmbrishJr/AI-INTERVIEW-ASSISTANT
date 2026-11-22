@@ -4,7 +4,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { RefreshCw, Search } from "lucide-react";
 import { FilterSelect, SearchInput } from "@/components/common/filters";
 import PageHeader from "@/components/common/page-header";
-import NewsCard, { CATEGORY_META, NewsCardSkeleton } from "@/components/news/news-card";
+import NewsCard, {
+  CATEGORY_META,
+  NewsCardSkeleton,
+} from "@/components/news/news-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FALLBACK_NEWS, type NewsItem } from "@/data/news";
@@ -14,32 +17,51 @@ import { toastInfo } from "@/hooks/use-toast";
 
 const CATEGORY_OPTIONS = [
   { value: "all", label: "All News" },
-  ...Object.entries(CATEGORY_META).map(([value, { label }]) => ({ value, label })),
+  ...Object.entries(CATEGORY_META).map(([value, { label }]) => ({
+    value,
+    label,
+  })),
 ];
 
 const SORT_OPTIONS = [
   { value: "latest", label: "Latest" },
-  { value: "trending", label: "Trending" },
-  { value: "relevance", label: "Relevance" },
+  { value: "trending", label: "Top scored" },
+  { value: "relevance", label: "Source order" },
 ] as const;
 
 type SortKey = (typeof SORT_OPTIONS)[number]["value"];
 
 const PAGE_SIZE = 20;
 
-async function fetchNews(category: string, search: string, sortBy: SortKey): Promise<NewsItem[]> {
-  const params = new URLSearchParams({ sortBy, limit: String(PAGE_SIZE), offset: "0" });
+async function fetchNews(
+  category: string,
+  search: string,
+  sortBy: SortKey,
+): Promise<{ news: NewsItem[]; fallback: boolean }> {
+  const params = new URLSearchParams({
+    sortBy,
+    limit: String(PAGE_SIZE),
+    offset: "0",
+  });
   if (category !== "all") params.set("category", category);
   if (search) params.set("search", search);
-
   try {
     const res = await fetch(`/api/news?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data: { news?: NewsItem[] } = await res.json();
-    return data.news ?? [];
+    if (!res.ok) throw new Error("News unavailable");
+    const data = await res.json();
+    if (data.source === "unavailable") throw new Error("Sources unavailable");
+    return { news: data.news ?? [], fallback: false };
   } catch {
-    toastInfo("Offline", "Couldn't reach the news service. Showing sample articles.");
-    return FALLBACK_NEWS;
+    return {
+      news: FALLBACK_NEWS.filter(
+        (item) =>
+          (category === "all" || item.category === category) &&
+          `${item.title} ${item.summary} ${item.tags.join(" ")}`
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+      ),
+      fallback: true,
+    };
   }
 }
 
@@ -50,13 +72,14 @@ export default function News() {
   const debouncedSearch = useDebouncedValue(search.trim());
   const bookmarks = useBookmarks("Article");
 
-  const { data: news = [], isLoading, isFetching, refetch } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["news", category, debouncedSearch, sortBy],
     queryFn: () => fetchNews(category, debouncedSearch, sortBy),
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
 
+  const news = data?.news ?? [];
   const clearFilters = () => {
     setCategory("all");
     setSearch("");
@@ -75,20 +98,44 @@ export default function News() {
             disabled={isFetching}
             onClick={async () => {
               await refetch();
-              toastInfo("Updated", "News feed refreshed successfully");
             }}
           >
-            <RefreshCw className={isFetching ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+            <RefreshCw
+              className={isFetching ? "h-4 w-4 animate-spin" : "h-4 w-4"}
+            />
             Refresh
           </Button>
         }
       />
 
+      {data?.fallback && (
+        <div
+          role="status"
+          className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          The live feed is unavailable. These are illustrative examples, not
+          current news. Use Refresh to try again.
+        </div>
+      )}
       <Card>
         <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-[1fr_12rem_10rem] gap-4">
-          <SearchInput value={search} onChange={setSearch} placeholder="Search news, companies, tech stack..." />
-          <FilterSelect value={category} onChange={setCategory} options={CATEGORY_OPTIONS} placeholder="Category" />
-          <FilterSelect value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} placeholder="Sort by" />
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search news, companies, tech stack..."
+          />
+          <FilterSelect
+            value={category}
+            onChange={setCategory}
+            options={CATEGORY_OPTIONS}
+            placeholder="Category"
+          />
+          <FilterSelect
+            value={sortBy}
+            onChange={setSortBy}
+            options={SORT_OPTIONS}
+            placeholder="Sort by"
+          />
         </CardContent>
       </Card>
 
@@ -102,7 +149,9 @@ export default function News() {
         <div className="text-center py-12 text-muted-foreground">
           <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>No news found matching your criteria.</p>
-          <p className="text-sm mb-4">Try adjusting your filters or search terms.</p>
+          <p className="text-sm mb-4">
+            Try adjusting your filters or search terms.
+          </p>
           <Button variant="outline" onClick={clearFilters}>
             Clear Filters
           </Button>

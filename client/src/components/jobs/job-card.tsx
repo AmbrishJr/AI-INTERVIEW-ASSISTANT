@@ -1,4 +1,15 @@
-import { Bookmark, Briefcase, Building, Calendar, Clock, DollarSign, ExternalLink, GraduationCap, MapPin, Users } from "lucide-react";
+import {
+  Bookmark,
+  Briefcase,
+  Building,
+  Calendar,
+  Clock,
+  DollarSign,
+  ExternalLink,
+  GraduationCap,
+  MapPin,
+  Users,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,27 +38,40 @@ interface JobCardProps {
   onToggleBookmark: () => void;
 }
 
-export default function JobCard({ job, bookmarked, onToggleBookmark }: JobCardProps) {
+export default function JobCard({
+  job,
+  bookmarked,
+  onToggleBookmark,
+}: JobCardProps) {
   const TypeIcon = TYPE_ICONS[job.type];
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
+    <Card className="h-full hover:border-slate-300 transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <TypeIcon className="h-4 w-4 text-muted-foreground" aria-label={job.type} />
-              <Badge variant="outline" className={EXPERIENCE_STYLES[job.experience]}>
+              <TypeIcon
+                className="h-4 w-4 text-muted-foreground"
+                aria-label={job.type}
+              />
+              <Badge
+                variant="outline"
+                className={EXPERIENCE_STYLES[job.experience]}
+              >
                 {job.experience}
               </Badge>
               {job.matchScore && (
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  {job.matchScore}% Match
+                <Badge
+                  variant="secondary"
+                  className="bg-green-100 text-green-800"
+                >
+                  {job.matchScore}% sample match
                 </Badge>
               )}
             </div>
             <h3 className="text-lg font-semibold mb-1">{job.title}</h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
               <Building className="h-4 w-4" />
               <span>{job.company}</span>
               <MapPin className="h-4 w-4 ml-2" />
@@ -68,11 +92,15 @@ export default function JobCard({ job, bookmarked, onToggleBookmark }: JobCardPr
             aria-pressed={bookmarked}
             className="text-muted-foreground hover:text-primary"
           >
-            <Bookmark className={bookmarked ? "h-4 w-4 fill-current" : "h-4 w-4"} />
+            <Bookmark
+              className={bookmarked ? "h-4 w-4 fill-current" : "h-4 w-4"}
+            />
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{job.description}</p>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+          {job.description}
+        </p>
 
         <div className="flex flex-wrap gap-1 mb-4">
           {job.techStack.slice(0, MAX_TECH_BADGES).map((tech) => (
@@ -87,7 +115,7 @@ export default function JobCard({ job, bookmarked, onToggleBookmark }: JobCardPr
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap gap-3 items-center justify-between">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
@@ -103,7 +131,7 @@ export default function JobCard({ job, bookmarked, onToggleBookmark }: JobCardPr
           <Button size="sm" asChild>
             <a href={job.url} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4 mr-1" />
-              Apply on {job.source}
+              Visit {job.source}
             </a>
           </Button>
         </div>

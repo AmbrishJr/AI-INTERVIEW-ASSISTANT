@@ -1,111 +1,105 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
-import { motion } from "framer-motion";
-import { ArrowRight, ChevronDown, Play } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
+import { Check, Mic, Pause, Video, AudioLines } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
-import { HERO_HEADLINE } from "@/data/home-content";
-
-function useTypewriter(text: string, msPerChar = 22) {
-  const [typed, setTyped] = useState("");
-
-  useEffect(() => {
-    let i = 0;
-    const id = setInterval(() => {
-      i += 1;
-      setTyped(text.slice(0, i));
-      if (i >= text.length) clearInterval(id);
-    }, msPerChar);
-    return () => clearInterval(id);
-  }, [text, msPerChar]);
-
-  return typed;
-}
-
-interface HeroSectionProps {
-  onWatchDemo: () => void;
-  onScrollDown: () => void;
-}
-
-export default function HeroSection({ onWatchDemo, onScrollDown }: HeroSectionProps) {
-  const [, setLocation] = useLocation();
-  const { isLoggedIn } = useAuth();
-  const headline = useTypewriter(HERO_HEADLINE);
-
+export function ProductPreview() {
   return (
-    <div className="relative h-[92vh] flex items-center justify-center overflow-hidden">
-      <HeroBackground />
-
-      <div className="relative z-20 max-w-7xl mx-auto px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-          <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">AI-powered session tracking</Badge>
-          <h1
-            className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent min-h-[1.2em]"
-            aria-label={HERO_HEADLINE}
-          >
-            {headline}
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Real-time AI feedback, a live session workspace, and analytics that turn practice into measurable improvement.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
-            {isLoggedIn ? (
-              <Button size="lg" onClick={() => setLocation("/dashboard")} className="text-lg px-8">
-                Go to Dashboard
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            ) : (
-              <Button size="lg" onClick={() => setLocation("/login")} className="text-lg px-8">
-                Start Free Session
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            )}
-            <Button size="lg" variant="outline" onClick={onWatchDemo} className="text-lg px-8 border-white/20 hover:bg-white/10">
-              <Play className="mr-2 h-5 w-5" />
-              Watch 60-sec Demo
-            </Button>
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 text-left">
+      <div className="flex justify-between border-b px-5 py-4 text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">Practice room</span>
+        <span>Illustrative preview</span>
+      </div>
+      <div className="p-5 sm:p-7">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>WEB DEVELOPMENT · TECHNICAL</span>
+          <span>01 / 20</span>
+        </div>
+        <p className="mt-4 text-lg sm:text-xl leading-relaxed font-medium">
+          How would you explain the difference between state and props in React?
+        </p>
+        <div className="mt-6 rounded-lg bg-slate-100 p-6 sm:p-8">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Your answer</span>
+            <AudioLines className="text-primary" size={22} />
           </div>
-
-          <motion.div
-            className="absolute bottom-16 left-1/2 -translate-x-1/2"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.5 }}
+          <div
+            className="my-7 flex h-12 items-center justify-center gap-1.5"
+            aria-hidden="true"
           >
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onScrollDown}
-              aria-label="Scroll to stats"
-              className="animate-bounce border-white/20 hover:bg-white/10"
-            >
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </motion.div>
-        </motion.div>
+            {[
+              12, 20, 32, 18, 40, 28, 44, 24, 36, 48, 26, 38, 20, 30, 42, 22,
+              34, 16, 28, 12,
+            ].map((height, i) => (
+              <span
+                key={i}
+                className="w-1.5 rounded-full bg-primary/60"
+                style={{ height }}
+              />
+            ))}
+          </div>
+          <div className="flex justify-center gap-3">
+            {[Mic, Pause, Video].map((Icon, i) => (
+              <span
+                key={i}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white border"
+              >
+                <Icon size={15} />
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+          <Check className="mt-0.5 text-emerald-700 shrink-0" size={17} />
+          <div>
+            <p className="text-sm font-medium text-emerald-900">
+              Make space for your next thought
+            </p>
+            <p className="mt-1 text-xs text-emerald-800">
+              Pause briefly before moving to your example.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
-function HeroBackground() {
+export default function HeroSection({
+  onWatchDemo,
+}: {
+  onWatchDemo: () => void;
+  onScrollDown?: () => void;
+}) {
+  const { isLoggedIn } = useAuth();
   return (
-    <div className="absolute inset-0 z-0">
-      <div className="absolute inset-0 bg-background/80 z-10 backdrop-blur-[2px]" />
-      <motion.div
-        className="absolute inset-0 z-10"
-        initial={{ opacity: 0.55 }}
-        animate={{ opacity: 0.75 }}
-        transition={{ duration: 2.2, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-        style={{
-          background:
-            "radial-gradient(1200px 600px at 50% 20%, rgba(0,240,255,0.18), transparent 55%), radial-gradient(900px 520px at 20% 70%, rgba(168,85,247,0.18), transparent 55%)",
-        }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10" />
-      <div className="w-full h-full bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 opacity-60" />
-    </div>
+    <section className="max-w-7xl mx-auto px-6 py-16 sm:py-24 lg:py-28 grid lg:grid-cols-2 items-center gap-14 lg:gap-20">
+      <div>
+        <p className="text-sm font-medium tracking-widest text-primary mb-6">
+          PREPARE WITH PURPOSE
+        </p>
+        <h1 className="text-5xl sm:text-6xl xl:text-7xl leading-[1.08] font-semibold tracking-[-0.045em]">
+          Find your words.
+          <br />
+          <span className="text-primary">Build your confidence.</span>
+        </h1>
+        <p className="mt-7 max-w-lg text-lg text-muted-foreground leading-relaxed">
+          Your next interview deserves more than last-minute prep. Practice out
+          loud, get useful feedback, and see how you’re improving.
+        </p>
+        <div className="mt-9 flex flex-wrap gap-3">
+          <Button size="lg" asChild>
+            <Link href={isLoggedIn ? "/practice" : "/login?next=/practice"}>
+              Start practicing
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" onClick={onWatchDemo}>
+            Explore the workspace
+          </Button>
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          Your pace. Your field. One answer at a time.
+        </p>
+      </div>
+      <ProductPreview />
+    </section>
   );
 }
