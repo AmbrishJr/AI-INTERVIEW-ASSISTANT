@@ -22,7 +22,7 @@ export default function PanelCard({
 }: PanelCardProps) {
   return (
     <Card className={cn("bg-card border-border", className)}>
-      <div className="p-4 border-b border-border flex items-center justify-between gap-3">
+      <div className="p-4 border-b border-border flex flex-wrap items-center justify-between gap-3">
         <h3 className="flex items-center gap-2 font-medium">
           {icon}
           {title}

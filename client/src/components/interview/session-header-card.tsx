@@ -67,9 +67,9 @@ export default function SessionHeaderCard({
       <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
 
       <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-start gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           <div>
-            <h2 className="text-muted-foreground text-sm font-mono uppercase tracking-wider">
+            <h2 className="text-muted-foreground text-sm font-mono uppercase tracking-wider break-words">
               {subtitle}
             </h2>
             <div className="flex items-center mt-1 space-x-2">
@@ -98,6 +98,7 @@ export default function SessionHeaderCard({
             </IconButton>
             <button
               type="button"
+              aria-label={exitLabel}
               onClick={onExit}
               className="px-3 py-1.5 bg-muted/50 hover:bg-muted text-foreground border border-border rounded-lg transition-all flex items-center gap-2 text-xs"
             >

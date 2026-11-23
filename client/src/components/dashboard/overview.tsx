@@ -89,18 +89,18 @@ export function QuickActionsCard({
   return (
     <GlassCard>
       <CardHeader>
-        <CardTitle>Quick actions</CardTitle>
+        <CardTitle>Make time for your next interview</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
-        <Button className="gap-2" onClick={() => setLocation("/session")}>
-          <Play className="h-4 w-4" /> Quick session
+        <Button className="gap-2" onClick={() => setLocation("/practice")}>
+          <Target className="h-4 w-4" /> Guided practice
         </Button>
         <Button
           variant="outline"
           className="gap-2"
-          onClick={() => setLocation("/practice")}
+          onClick={() => setLocation("/session")}
         >
-          <Target className="h-4 w-4" /> Guided practice
+          <Play className="h-4 w-4" /> Quick session
         </Button>
         <Button
           variant="outline"

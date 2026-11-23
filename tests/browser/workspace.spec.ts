@@ -75,6 +75,10 @@ test("registration, persisted sign-in, complete session, export, analytics and l
   page,
 }) => {
   await createAccount(page);
+  await page.goto("/profile");
+  await page.getByLabel("Display name").fill("Alex");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await page.getByRole("link", { name: "Overview", exact: true }).click();
   await page.reload();
   await expect(
     page.getByRole("heading", { name: /Welcome back/ }),
@@ -89,7 +93,9 @@ test("registration, persisted sign-in, complete session, export, analytics and l
   await page
     .getByRole("link", { name: "Guided practice", exact: true })
     .click();
-  await expect(page.getByRole("heading", { name: "Build your practice session" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Build your practice session" }),
+  ).toBeVisible();
   await page.screenshot({
     path: "/tmp/aicoach-practice-desktop.png",
     fullPage: true,
@@ -162,7 +168,9 @@ test("navigation guard, pressure mode, bookmarks and coach failure", async ({
     .getByRole("button", { name: "Start Session", exact: true })
     .first()
     .click();
-  await page.getByRole("button", { name: "Pressure mode", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Pressure mode", exact: true })
+    .click();
   for (const button of await page
     .getByRole("button", { name: "Pause", exact: true })
     .all())
@@ -203,15 +211,95 @@ test("navigation guard, pressure mode, bookmarks and coach failure", async ({
   ).toBeVisible();
 });
 
-test("every route fits mobile, tablet, and desktop widths", async ({page})=>{
- await createAccount(page);
- const errors:string[]=[];page.on("pageerror",error=>errors.push(error.message));
- for(const width of [320,768,1440]) {
-  await page.setViewportSize({width,height:900});
-  for(const path of ["/","/login","/dashboard","/practice","/session","/analytics","/profile","/news","/jobs","/projects","/missing-page"]) {
-   await page.goto(path);await expect(page.getByRole("heading").first()).toBeVisible();
-   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),`${path} overflows at ${width}px`).toBeTruthy();
+test("every route fits mobile, tablet, and desktop widths", async ({
+  page,
+}) => {
+  await createAccount(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  for (const width of [320, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of [
+      "/",
+      "/login",
+      "/dashboard",
+      "/practice",
+      "/session",
+      "/analytics",
+      "/profile",
+      "/news",
+      "/jobs",
+      "/projects",
+      "/missing-page",
+    ]) {
+      await page.goto(path);
+      await expect(page.getByRole("heading").first()).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+        ),
+        `${path} overflows at ${width}px`,
+      ).toBeTruthy();
+    }
   }
- }
- expect(errors).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test("speech totals survive a pause and reset for a new session", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    class Recognition {
+      onresult: ((event: unknown) => void) | null = null;
+      timer: number | undefined;
+      start() {
+        this.timer = window.setTimeout(() => {
+          const result = Object.assign([{ transcript: "hello practice" }], {
+            isFinal: true,
+          });
+          this.onresult?.({ resultIndex: 0, results: [result] });
+        }, 100);
+      }
+      stop() {
+        window.clearTimeout(this.timer);
+      }
+      abort() {
+        this.stop();
+      }
+    }
+    Object.defineProperty(window, "SpeechRecognition", {
+      value: Recognition,
+      configurable: true,
+    });
+  });
+  await createAccount(page);
+  await page.getByRole("link", { name: "Quick session", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Start Session", exact: true })
+    .first()
+    .click();
+  await expect(page.getByText("2 / 0", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Pause", exact: true })
+    .first()
+    .click();
+  await page
+    .getByRole("button", { name: "Resume", exact: true })
+    .first()
+    .click();
+  await expect(page.getByText("4 / 0", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "End Session", exact: true })
+    .first()
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "End Session", exact: true })
+    .click();
+  await page.keyboard.press("Escape");
+  await page
+    .getByRole("button", { name: "Start Session", exact: true })
+    .first()
+    .click();
+  await expect(page.getByText("2 / 0", { exact: true })).toBeVisible();
 });

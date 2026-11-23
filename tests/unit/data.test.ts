@@ -110,3 +110,31 @@ test("invalid history is ignored and the latest ten records are retained", () =>
   assert.equal(loadSessionHistory().length, 10);
   assert.equal(loadSessionHistory()[0].id, "11");
 });
+
+test("storage failures keep data for the current visit and allow a draft to be cleared", () => {
+  const original = globalThis.localStorage;
+  setLocalAccount("storage-unavailable");
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: () => "stale",
+      setItem: () => {
+        throw new Error("quota");
+      },
+      removeItem: () => {
+        throw new Error("blocked");
+      },
+    },
+  });
+  try {
+    assert.equal(writeLocal("sessionNotes", "draft"), false);
+    assert.equal(readLocal("sessionNotes"), "draft");
+    assert.equal(writeLocal("sessionNotes", null), false);
+    assert.equal(readLocal("sessionNotes"), null);
+  } finally {
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: original,
+    });
+  }
+});

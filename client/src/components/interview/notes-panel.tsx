@@ -24,13 +24,13 @@ export default function NotesPanel({
       icon={<BookOpen className="w-4 h-4 text-blue-700" />}
       title="Session Notes"
       actions={
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
             <input
               type="checkbox"
               checked={autoSave}
               onChange={(e) => onAutoSaveChange(e.target.checked)}
-              className="rounded border-gray-600 bg-gray-700"
+              className="rounded border-input accent-primary"
             />
             Auto-save
           </label>

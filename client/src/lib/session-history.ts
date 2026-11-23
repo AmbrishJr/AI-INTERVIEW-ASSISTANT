@@ -64,9 +64,9 @@ export function upsertSessionRecord(record: SessionRecord): SessionRecord[] {
   const rest = loadSessionHistory().filter((s) => s.id !== record.id);
   const next = [record, ...rest].slice(0, MAX_HISTORY);
   if (!writeLocal(HISTORY_KEY, JSON.stringify(next)))
-      throw new Error(
-        "Session kept for this visit only. Browser storage is unavailable.",
-      );
+    throw new Error(
+      "Session kept for this visit only. Browser storage is unavailable.",
+    );
   return next;
 }
 
@@ -78,11 +78,6 @@ export function loadNotesDraft(): string {
   }
 }
 
-export function saveNotesDraft(notes: string) {
-  try {
-    if (notes) writeLocal(NOTES_KEY, notes);
-    else writeLocal(NOTES_KEY, null);
-  } catch {
-    // ignore storage failures
-  }
+export function saveNotesDraft(notes: string): boolean {
+  return writeLocal(NOTES_KEY, notes || null);
 }

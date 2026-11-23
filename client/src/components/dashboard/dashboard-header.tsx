@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 export function LiveClock({ timeOnly = false }: { timeOnly?: boolean }) {
   const now = new Date();
@@ -13,7 +15,11 @@ export function LiveClock({ timeOnly = false }: { timeOnly?: boolean }) {
     </span>
   );
 }
-export default function DashboardHeader() {
+export default function DashboardHeader({
+  onRefresh,
+}: {
+  onRefresh: () => void;
+}) {
   const { profileName } = useAuth();
   return (
     <header className="flex flex-wrap justify-between items-end gap-4">
@@ -28,7 +34,17 @@ export default function DashboardHeader() {
           Make a little progress toward your next interview.
         </p>
       </div>
-      <LiveClock />
+      <div className="flex items-center gap-3">
+        <LiveClock />
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onRefresh}
+          aria-label="Refresh dashboard"
+        >
+          <RefreshCw size={16} />
+        </Button>
+      </div>
     </header>
   );
 }

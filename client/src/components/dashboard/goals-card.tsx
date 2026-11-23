@@ -13,6 +13,7 @@ interface Goal {
   targetPerDayMinutes: number;
   progressMinutesToday: number;
   completed: boolean;
+  progressDate: string;
 }
 
 const STORAGE_KEY = "dashboardGoals";
@@ -27,8 +28,14 @@ function loadGoals(): Goal[] {
         id: String(g?.id ?? ""),
         title: String(g?.title ?? ""),
         targetPerDayMinutes: Number(g?.targetPerDayMinutes ?? 0),
-        progressMinutesToday: Number(g?.progressMinutesToday ?? 0),
-        completed: Boolean(g?.completed),
+        progressMinutesToday:
+          g?.progressDate === new Date().toDateString()
+            ? Math.max(0, Number(g?.progressMinutesToday) || 0)
+            : 0,
+        completed:
+          g?.progressDate === new Date().toDateString() &&
+          Boolean(g?.completed),
+        progressDate: new Date().toDateString(),
       }))
       .filter((g) => g.id && g.title);
   } catch {
@@ -57,7 +64,7 @@ const GoalsCard = forwardRef<HTMLDivElement, { className?: string }>(
       if (
         !draftTitle.trim() ||
         !Number.isFinite(draftMinutes) ||
-        draftMinutes <= 0
+        draftMinutes < 1
       ) {
         toastError(
           "Invalid goal",
@@ -71,6 +78,7 @@ const GoalsCard = forwardRef<HTMLDivElement, { className?: string }>(
         targetPerDayMinutes: Math.round(draftMinutes),
         progressMinutesToday: 0,
         completed: false,
+        progressDate: new Date().toDateString(),
       };
       setGoals((prev) => [goal, ...prev]);
       toastSuccess("Goal created", "Your goal was added.");
@@ -78,7 +86,11 @@ const GoalsCard = forwardRef<HTMLDivElement, { className?: string }>(
 
     const updateGoal = (id: string, patch: Partial<Goal>) =>
       setGoals((prev) =>
-        prev.map((g) => (g.id === id ? { ...g, ...patch } : g)),
+        prev.map((g) =>
+          g.id === id
+            ? { ...g, ...patch, progressDate: new Date().toDateString() }
+            : g,
+        ),
       );
 
     return (

@@ -62,14 +62,24 @@ export function useInterviewSession(questions: string[], context?: string) {
     setElapsedSeconds(0);
   };
 
-  const setNotes = useCallback((value: string) => {
-    setNotesState(value);
-    saveNotesDraft(value);
-  }, []);
+  const storageWarningShown = useRef(false);
+  const setNotes = useCallback(
+    (value: string) => {
+      setNotesState(value);
+      if (autoSave && !saveNotesDraft(value) && !storageWarningShown.current) {
+        storageWarningShown.current = true;
+        toastError(
+          "Notes saved for this visit only",
+          "Browser storage is unavailable. Copy important notes before closing the page.",
+        );
+      }
+    },
+    [autoSave],
+  );
 
   const saveRecord = useCallback(
     (metrics?: SessionMetrics, savedStatus?: SessionRecord["status"]) => {
-      saveNotesDraft(notes);
+      const notesSaved = saveNotesDraft(notes);
       if (sessionMeta.current) {
         try {
           setHistory(
@@ -94,7 +104,12 @@ export function useInterviewSession(questions: string[], context?: string) {
           return;
         }
       }
-      setLastSaved(new Date());
+      if (notesSaved) setLastSaved(new Date());
+      else
+        toastError(
+          "Notes saved for this visit only",
+          "Browser storage is unavailable.",
+        );
     },
     [notes, status, context],
   );
@@ -106,7 +121,7 @@ export function useInterviewSession(questions: string[], context?: string) {
     accumulatedMs.current = 0;
     runStartedAt.current = Date.now();
     sessionMeta.current = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       startedAt: new Date().toISOString(),
     };
     setElapsedSeconds(0);
@@ -149,6 +164,7 @@ export function useInterviewSession(questions: string[], context?: string) {
     resetTimer();
     setStatus("idle");
     setNotes("");
+    saveNotesDraft("");
     setQuestionIndex(0);
     setTranscript(INITIAL_TRANSCRIPT);
   }, [setNotes]);
@@ -198,6 +214,7 @@ export function useInterviewSession(questions: string[], context?: string) {
   }, [currentQuestion, isActive]);
 
   return {
+    sessionId: sessionMeta.current?.id ?? null,
     status,
     isActive,
     elapsedSeconds,

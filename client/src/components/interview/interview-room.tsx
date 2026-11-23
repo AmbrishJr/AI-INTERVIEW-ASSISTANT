@@ -89,7 +89,11 @@ export default function InterviewRoom({
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const running = session.status === "running";
   const face = useFaceDetection(video, camOn);
-  const speech = useSpeechAnalysis(running && micOn, session.addUserText);
+  const speech = useSpeechAnalysis(
+    running && micOn,
+    session.addUserText,
+    session.sessionId,
+  );
   const coaching = useLiveCoaching({
     active: running,
     micOn,
@@ -213,7 +217,7 @@ export default function InterviewRoom({
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 min-w-0 space-y-4">
           <SessionHeaderCard
             session={session}
             pressureMode={pressureMode}
@@ -263,7 +267,7 @@ export default function InterviewRoom({
           {showHistory && <SessionHistoryPanel sessions={session.history} />}
         </div>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <InterviewTimer
             status={session.status}
             elapsedSeconds={session.elapsedSeconds}

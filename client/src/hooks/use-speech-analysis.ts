@@ -65,6 +65,7 @@ const getRecognitionCtor = () =>
 export function useSpeechAnalysis(
   enabled: boolean,
   onFinalText?: (text: string) => void,
+  resetKey?: unknown,
 ): SpeechAnalysis {
   const supported = Boolean(getRecognitionCtor());
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +83,14 @@ export function useSpeechAnalysis(
 
   const onFinalTextRef = useRef(onFinalText);
   onFinalTextRef.current = onFinalText;
+
+  useEffect(() => {
+    setTotals({ words: 0, fillers: 0 });
+    setLastSegment(null);
+    setInterim("");
+    lastSpokeAtRef.current = null;
+    voicedSinceResultMs.current = 0;
+  }, [resetKey]);
 
   // --- Voice activity detection from raw microphone volume ---
   useEffect(() => {
@@ -170,6 +179,9 @@ export function useSpeechAnalysis(
       })
       .catch((err: DOMException) => {
         if (cancelled) return;
+        stream?.getTracks().forEach((track) => track.stop());
+        void audioCtx?.close().catch(() => {});
+        setMicReady(false);
         setMicError(true);
         setError(
           ERROR_MESSAGES[
@@ -206,6 +218,7 @@ export function useSpeechAnalysis(
     recognition.lang = navigator.language || "en-US";
 
     recognition.onresult = (event) => {
+      if (stopped) return;
       voicedSinceResultMs.current = 0;
       setTranscriptStalled(false);
       let interimText = "";

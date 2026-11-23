@@ -75,12 +75,14 @@ export default function WebcamPanel({
   return (
     <div
       className={cn(
-        "relative rounded-2xl overflow-hidden bg-black border aspect-video min-h-[280px] transition-colors",
+        "relative w-full min-w-0 h-[280px] sm:h-auto sm:aspect-video rounded-xl overflow-hidden bg-black border transition-colors",
         showFaceAlert ? "border-red-500/70" : "border-white/10",
       )}
     >
       {camOn ? (
         <Webcam
+          width={640}
+          height={360}
           key={camKey}
           ref={webcamRef}
           className="absolute inset-0 w-full h-full object-cover"
@@ -115,7 +117,7 @@ export default function WebcamPanel({
       )}
 
       {camOn && camError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-6">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-3 sm:p-6">
           <div className="max-w-md w-full rounded-xl border border-white/10 bg-zinc-900/80 backdrop-blur p-4 text-center">
             <div className="text-sm font-medium text-white mb-1">
               Camera not available
@@ -143,11 +145,11 @@ export default function WebcamPanel({
         <FaceAlert multiple={face.status === "multiple-faces"} />
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center gap-4">
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center gap-2 px-2">
         <Button
           variant={micOn ? "secondary" : "destructive"}
           size="icon"
-          className="rounded-full w-12 h-12"
+          className="rounded-full w-10 h-10 sm:w-12 sm:h-12 shrink-0"
           onClick={onToggleMic}
           aria-label={micOn ? "Mute microphone" : "Unmute microphone"}
           aria-pressed={!micOn}
@@ -159,7 +161,7 @@ export default function WebcamPanel({
           variant={isActive ? "destructive" : "default"}
           size="lg"
           className={cn(
-            "rounded-lg px-6 font-medium",
+            "rounded-lg px-3 sm:px-6 font-medium",
             isActive
               ? "bg-red-500 hover:bg-red-600 shadow-red-500/30"
               : "bg-primary hover:bg-primary/90 text-primary-foreground",
@@ -180,7 +182,7 @@ export default function WebcamPanel({
         <Button
           variant={camOn ? "secondary" : "destructive"}
           size="icon"
-          className="rounded-full w-12 h-12"
+          className="rounded-full w-10 h-10 sm:w-12 sm:h-12 shrink-0"
           onClick={toggleCamera}
           aria-label={camOn ? "Turn camera off" : "Turn camera on"}
           aria-pressed={!camOn}

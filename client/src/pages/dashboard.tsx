@@ -7,10 +7,7 @@ import {
 } from "@/components/dashboard/dashboard-data";
 import FocusTimerCard from "@/components/dashboard/focus-timer-card";
 import GoalsCard from "@/components/dashboard/goals-card";
-import {
-  QuickActionsCard,
-  StatCards,
-} from "@/components/dashboard/overview";
+import { QuickActionsCard, StatCards } from "@/components/dashboard/overview";
 import PerformanceChartCard from "@/components/dashboard/performance-chart-card";
 import SessionsTableCard from "@/components/dashboard/sessions-table-card";
 import {
@@ -34,7 +31,7 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto pb-6 space-y-8">
-      <DashboardHeader />
+      <DashboardHeader onRefresh={refresh} />
 
       <QuickActionsCard
         onCreateGoal={() =>

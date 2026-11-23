@@ -83,12 +83,10 @@ export async function registerRoutes(
   const safeUser = (user: any) => ({ id: user.id, username: user.username });
   const requireAI = (_req: Request, res: Response, next: NextFunction) => {
     if (!process.env.GROQ_API_KEY) {
-      res
-        .status(503)
-        .json({
-          message:
-            "AI coaching is not configured. Your practice measurements are still available.",
-        });
+      res.status(503).json({
+        message:
+          "AI coaching is not configured. Your practice measurements are still available.",
+      });
       return;
     }
     next();
@@ -512,12 +510,10 @@ Focus on:
             .parse(parseAIJson(aiResponse));
           res.json(parsedResponse);
         } catch (parseError) {
-          res
-            .status(502)
-            .json({
-              message:
-                "The AI service returned an invalid response. Please try again.",
-            });
+          res.status(502).json({
+            message:
+              "The AI service returned an invalid response. Please try again.",
+          });
         }
       } catch (error) {
         if (error instanceof z.ZodError)
@@ -600,12 +596,10 @@ Keep explanations:
             .parse(parseAIJson(aiResponse));
           res.json(parsedResponse);
         } catch (parseError) {
-          res
-            .status(502)
-            .json({
-              message:
-                "The AI service returned an invalid explanation. Please try again.",
-            });
+          res.status(502).json({
+            message:
+              "The AI service returned an invalid explanation. Please try again.",
+          });
         }
       } catch (error) {
         if (error instanceof z.ZodError)
@@ -623,7 +617,21 @@ Keep explanations:
   // Global AI Insights endpoint
   app.post("/api/ai/insights", requireAI, async (req, res) => {
     try {
-      const { type, data, context, timeframe, preferences } = req.body;
+      const { type, data, context, timeframe, preferences } = z
+        .object({
+          type: z.enum([
+            "trend",
+            "summary",
+            "recommendation",
+            "prediction",
+            "anomaly",
+          ]),
+          data: z.union([z.record(z.unknown()), z.array(z.unknown()).max(100)]),
+          context: z.string().max(2000).optional(),
+          timeframe: z.string().max(80).optional(),
+          preferences: z.record(z.unknown()).optional(),
+        })
+        .parse(req.body);
 
       if (!type || !data) {
         return res.status(400).json({ message: "Type and data are required" });
