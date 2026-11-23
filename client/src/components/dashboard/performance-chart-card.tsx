@@ -72,16 +72,22 @@ export default function PerformanceChartCard({
                   dataKey="date"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 />
                 <YAxis
                   domain={[0, 100]}
                   width={35}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 />
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--popover))",
+                    borderColor: "hsl(var(--border))",
+                    color: "hsl(var(--popover-foreground))",
+                    borderRadius: 8,
+                  }}
                   formatter={(value: number) => [`${value}%`, "Facing camera"]}
                 />
                 <Line

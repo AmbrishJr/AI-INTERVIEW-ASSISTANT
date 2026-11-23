@@ -28,20 +28,20 @@ export default function MarketTrends({ trends }: { trends: JobTrend[] }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
               🚀 High Growth Areas
             </h4>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
               AI/ML and DevOps roles showing 40%+ growth. Focus on cloud skills
               and automation tools.
             </p>
           </div>
-          <div className="p-4 bg-green-50 rounded-lg">
-            <h4 className="font-semibold text-green-800 mb-2">
+          <div className="p-4 bg-green-50 dark:bg-green-950/50 rounded-lg">
+            <h4 className="font-semibold text-green-800 dark:text-green-300 mb-2">
               💡 Skill Recommendations
             </h4>
-            <p className="text-sm text-green-700">
+            <p className="text-sm text-green-700 dark:text-green-300">
               Python, AWS, and Kubernetes appear in 70% of high-paying tech
               roles.
             </p>
@@ -58,7 +58,7 @@ function TrendCard({ trend }: { trend: JobTrend }) {
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">{trend.role}</h3>
-          <div className="flex items-center gap-1 text-green-600">
+          <div className="flex items-center gap-1 text-green-600 dark:text-green-300">
             <TrendingUp className="h-4 w-4" />
             <span className="font-medium">+{trend.growth}%</span>
           </div>

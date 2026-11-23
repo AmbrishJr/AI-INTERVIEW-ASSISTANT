@@ -13,6 +13,7 @@ AICoach is a full-stack web app for practicing job interviews. It runs mock inte
 - **Tech news**: aggregated from Hacker News and Reddit, with AI summaries.
 - **Jobs and projects**: clearly labeled sample job listings, market trends, project ideas, and research papers.
 - **Authentication**: real username/password registration and login with server sessions (Passport + bcrypt).
+- **Appearance**: choose Light, Dark, or System from the sun/moon menu. The preference is saved in this browser, shared across tabs, and applied before the app loads. System mode follows changes to your device theme.
 - **Local account data**: summaries, notes, goals, bookmarks, and display names are stored in this browser, separately for each account. Legacy unscoped data can be explicitly imported once.
 
 ## Tech Stack
@@ -32,7 +33,7 @@ AICoach is a full-stack web app for practicing job interviews. It runs mock inte
 │   └── src/
 │       ├── components/     # Feature-based components (interview, dashboard, analytics, ...)
 │       │   └── ui/         # Shared UI primitives (shadcn-style)
-│       ├── contexts/       # Auth context
+│       ├── contexts/       # Auth and theme contexts
 │       ├── data/           # Question banks and static content
 │       ├── hooks/          # Face detection, speech analysis, live coaching, session recording
 │       ├── lib/            # Utilities and query client

@@ -13,6 +13,7 @@ import DemoDialog from "@/components/home/demo-dialog";
 import { ExpandableCard } from "@/components/home/section";
 import NewsletterSection from "@/components/home/newsletter-section";
 import { Button } from "@/components/ui/button";
+import { ThemeMenu } from "@/components/common/theme-menu";
 import { useAuth } from "@/contexts/auth-context";
 const features = [
   {
@@ -59,7 +60,7 @@ export default function Home() {
           aicoach<span className="text-primary">.</span>
         </Link>
         <nav
-          className="flex items-center gap-6 text-sm"
+          className="flex items-center gap-2 sm:gap-6 text-sm"
           aria-label="Main navigation"
         >
           <a
@@ -74,6 +75,7 @@ export default function Home() {
           >
             Resources
           </Link>
+          <ThemeMenu />
           <Button variant="outline" asChild>
             <Link href={isLoggedIn ? "/dashboard" : "/login"}>
               {isLoggedIn ? "Your workspace" : "Sign in"}
@@ -96,7 +98,7 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-10">
             {features.map(({ Icon, title, text }) => (
-              <article key={title} className="border-t border-slate-300 pt-6">
+              <article key={title} className="border-t border-border pt-6">
                 <Icon className="text-primary mb-6" size={24} />
                 <h3 className="text-xl font-semibold">{title}</h3>
                 <p className="mt-3 text-muted-foreground leading-relaxed">

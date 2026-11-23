@@ -101,7 +101,7 @@ export default function PracticeSetup({
                 {["Easy", "Medium", "Hard"].map((value) => (
                   <label
                     key={value}
-                    className={`cursor-pointer rounded-lg border p-3 text-center text-sm ${setup.difficulty === value ? "border-primary bg-blue-50 text-primary" : "hover:bg-muted"}`}
+                    className={`cursor-pointer rounded-lg border p-3 text-center text-sm ${setup.difficulty === value ? "border-primary bg-blue-50 dark:bg-blue-950/50 text-primary" : "hover:bg-muted"}`}
                   >
                     <input
                       type="radio"

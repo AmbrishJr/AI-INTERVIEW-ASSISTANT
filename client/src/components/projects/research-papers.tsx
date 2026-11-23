@@ -33,20 +33,20 @@ export default function ResearchPapers({
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-purple-50 rounded-lg">
-            <h4 className="font-semibold text-purple-800 mb-2">
+          <div className="p-4 bg-purple-50 dark:bg-purple-950/50 rounded-lg">
+            <h4 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">
               🔥 Trending Research Areas
             </h4>
-            <p className="text-sm text-purple-700">
+            <p className="text-sm text-purple-700 dark:text-purple-300">
               Vision Transformers and Quantum ML are dominating recent
               publications with 40%+ growth.
             </p>
           </div>
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
               📊 Industry Applications
             </h4>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
               Healthcare and finance sectors are leading in AI research adoption
               and funding.
             </p>
@@ -62,8 +62,11 @@ function PaperCard({ paper }: { paper: ResearchPaper }) {
     <Card className="h-full">
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="h-4 w-4 text-purple-600" />
-          <Badge variant="outline" className="bg-purple-100 text-purple-800">
+          <BookOpen className="h-4 w-4 text-purple-600 dark:text-purple-300" />
+          <Badge
+            variant="outline"
+            className="bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300"
+          >
             {paper.category.toUpperCase()}
           </Badge>
           <span className="flex items-center gap-1 text-sm text-muted-foreground ml-auto">
@@ -87,7 +90,7 @@ function PaperCard({ paper }: { paper: ResearchPaper }) {
         {paper.keyFindings.length > 0 && (
           <div className="mb-4">
             <div className="text-sm font-medium mb-2">🔬 Key Findings</div>
-            <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5 marker:text-purple-600">
+            <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5 marker:text-purple-600 dark:marker:text-purple-300">
               {paper.keyFindings.slice(0, 2).map((finding) => (
                 <li key={finding}>{finding}</li>
               ))}

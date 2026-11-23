@@ -10,7 +10,9 @@ export default function SessionHistoryPanel({
 }) {
   return (
     <PanelCard
-      icon={<History className="w-4 h-4 text-purple-700" />}
+      icon={
+        <History className="w-4 h-4 text-purple-700 dark:text-purple-300" />
+      }
       title="Session History"
     >
       {sessions.length > 0 ? (

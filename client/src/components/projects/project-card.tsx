@@ -19,18 +19,22 @@ import type {
 } from "@/data/projects";
 
 const CATEGORY_STYLES: Record<ProjectCategory, string> = {
-  ai: "bg-purple-100 text-purple-800",
-  web: "bg-blue-100 text-blue-800",
-  mobile: "bg-green-100 text-green-800",
-  blockchain: "bg-orange-100 text-orange-800",
-  data: "bg-cyan-100 text-cyan-800",
-  iot: "bg-red-100 text-red-800",
+  ai: "bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300",
+  web: "bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300",
+  mobile:
+    "bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300",
+  blockchain:
+    "bg-orange-100 dark:bg-orange-950/50 text-orange-800 dark:text-orange-300",
+  data: "bg-cyan-100 dark:bg-cyan-950/50 text-cyan-800 dark:text-cyan-300",
+  iot: "bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-300",
 };
 
 const DIFFICULTY_STYLES: Record<ProjectDifficulty, string> = {
-  beginner: "bg-green-100 text-green-800",
-  intermediate: "bg-yellow-100 text-yellow-800",
-  advanced: "bg-red-100 text-red-800",
+  beginner:
+    "bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300",
+  intermediate:
+    "bg-yellow-100 dark:bg-yellow-950/50 text-yellow-800 dark:text-yellow-300",
+  advanced: "bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-300",
 };
 
 const AUTHOR_ICONS: Record<AuthorType, typeof Building> = {
@@ -56,7 +60,7 @@ export default function ProjectCard({
   const AuthorIcon = AUTHOR_ICONS[project.authorType];
 
   return (
-    <Card className="h-full hover:border-slate-300 transition-shadow">
+    <Card className="h-full hover:border-input transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -128,8 +132,8 @@ export default function ProjectCard({
         </div>
 
         {project.learningOutcomes.length > 0 && (
-          <div className="p-3 bg-blue-50 rounded-lg mb-4">
-            <div className="text-sm font-medium text-blue-800 mb-1">
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg mb-4">
+            <div className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-1">
               What you’ll learn
             </div>
             <div className="flex flex-wrap gap-1">
@@ -137,7 +141,7 @@ export default function ProjectCard({
                 <Badge
                   key={outcome}
                   variant="secondary"
-                  className="text-xs bg-blue-100 text-blue-800"
+                  className="text-xs bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300"
                 >
                   {outcome}
                 </Badge>

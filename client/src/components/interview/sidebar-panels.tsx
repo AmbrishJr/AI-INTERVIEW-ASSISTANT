@@ -36,9 +36,9 @@ const FACE_LABELS: Record<
 };
 
 const TONE_TEXT = {
-  ok: "text-green-700",
-  warn: "text-yellow-700",
-  bad: "text-red-700",
+  ok: "text-green-700 dark:text-green-300",
+  warn: "text-yellow-700 dark:text-yellow-300",
+  bad: "text-red-700 dark:text-red-300",
   muted: "text-muted-foreground",
 };
 
@@ -69,7 +69,9 @@ export function FeedbackPanel({
 
   return (
     <PanelCard
-      icon={<Sparkles className="w-4 h-4 text-yellow-700" />}
+      icon={
+        <Sparkles className="w-4 h-4 text-yellow-700 dark:text-yellow-300" />
+      }
       title="Live Feedback"
       bodyClassName="space-y-4"
     >
@@ -100,7 +102,7 @@ export function FeedbackPanel({
       </dl>
 
       {micOn && active && (speech.error || speech.transcriptStalled) && (
-        <p className="flex items-start gap-2 text-xs text-yellow-700">
+        <p className="flex items-start gap-2 text-xs text-yellow-700 dark:text-yellow-300">
           <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           {speech.error ??
             "We can hear you, but this browser isn't returning a transcript, so pace and filler-word feedback is off. Try Google Chrome."}
@@ -129,7 +131,7 @@ export function FeedbackPanel({
         <ul className="space-y-2 text-sm">
           {TIPS.map((tip) => (
             <li key={tip} className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 mt-0.5 text-green-700 shrink-0" />
+              <CheckCircle className="w-4 h-4 mt-0.5 text-green-700 dark:text-green-300 shrink-0" />
               <span>{tip}</span>
             </li>
           ))}
@@ -169,7 +171,7 @@ export function QuestionProgressPanel({
   const current = Math.min(index + 1, total);
   return (
     <PanelCard
-      icon={<BookOpen className="w-4 h-4 text-blue-700" />}
+      icon={<BookOpen className="w-4 h-4 text-blue-700 dark:text-blue-300" />}
       title="Question Progress"
       bodyClassName="space-y-2"
     >
@@ -205,7 +207,7 @@ export function SessionOptionsPanel({
 }: SessionOptionsPanelProps) {
   return (
     <PanelCard
-      icon={<Settings2 className="w-4 h-4 text-blue-700" />}
+      icon={<Settings2 className="w-4 h-4 text-blue-700 dark:text-blue-300" />}
       title="Session Options"
       bodyClassName="space-y-3"
     >
@@ -220,7 +222,7 @@ export function SessionOptionsPanel({
           className={cn(
             "gap-1.5",
             pressureMode
-              ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-700 hover:bg-yellow-500/20"
+              ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-500/20"
               : "border-border",
           )}
         >

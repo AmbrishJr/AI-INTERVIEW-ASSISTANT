@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 export function ProductPreview() {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 text-left">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-black/5 dark:shadow-black/20 text-left">
       <div className="flex justify-between border-b px-5 py-4 text-xs text-muted-foreground">
         <span className="font-medium text-foreground">Practice room</span>
         <span>Illustrative preview</span>
@@ -17,7 +17,7 @@ export function ProductPreview() {
         <p className="mt-4 text-lg sm:text-xl leading-relaxed font-medium">
           How would you explain the difference between state and props in React?
         </p>
-        <div className="mt-6 rounded-lg bg-slate-100 p-6 sm:p-8">
+        <div className="mt-6 rounded-lg bg-muted p-6 sm:p-8">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Your answer</span>
             <AudioLines className="text-primary" size={22} />
@@ -41,20 +41,23 @@ export function ProductPreview() {
             {[Mic, Pause, Video].map((Icon, i) => (
               <span
                 key={i}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white border"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-card border"
               >
                 <Icon size={15} />
               </span>
             ))}
           </div>
         </div>
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-          <Check className="mt-0.5 text-emerald-700 shrink-0" size={17} />
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-100 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/50 p-4">
+          <Check
+            className="mt-0.5 text-emerald-700 dark:text-emerald-300 shrink-0"
+            size={17}
+          />
           <div>
-            <p className="text-sm font-medium text-emerald-900">
+            <p className="text-sm font-medium text-emerald-900 dark:text-emerald-300">
               Make space for your next thought
             </p>
-            <p className="mt-1 text-xs text-emerald-800">
+            <p className="mt-1 text-xs text-emerald-800 dark:text-emerald-300">
               Pause briefly before moving to your example.
             </p>
           </div>

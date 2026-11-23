@@ -26,19 +26,19 @@ export const TOPIC_ICONS: Record<CoachingTopic, typeof Eye> = {
 
 export const TONE_STYLES: Record<CoachingTone, { box: string; bar: string }> = {
   positive: {
-    box: "bg-green-500/15 border-green-500/30 text-green-700",
+    box: "bg-green-500/15 border-green-500/30 text-green-700 dark:text-green-300",
     bar: "bg-green-500",
   },
   suggestion: {
-    box: "bg-blue-500/15 border-blue-500/30 text-blue-700",
+    box: "bg-blue-500/15 border-blue-500/30 text-blue-700 dark:text-blue-300",
     bar: "bg-blue-500",
   },
   warning: {
-    box: "bg-yellow-500/15 border-yellow-500/30 text-yellow-800",
+    box: "bg-yellow-500/15 border-yellow-500/30 text-yellow-800 dark:text-yellow-300",
     bar: "bg-yellow-500",
   },
   error: {
-    box: "bg-red-500/15 border-red-500/30 text-red-700",
+    box: "bg-red-500/15 border-red-500/30 text-red-700 dark:text-red-300",
     bar: "bg-red-500",
   },
 };

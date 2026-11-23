@@ -140,7 +140,7 @@ export default function SessionHeaderCard({
           ) : status === "paused" ? (
             <Button
               onClick={session.resume}
-              className="gap-1.5 bg-green-600 hover:bg-green-700"
+              className="gap-1.5 border-green-700 bg-green-700 text-white hover:bg-green-800"
             >
               <Play className="w-4 h-4" />
               Resume
@@ -202,7 +202,7 @@ export default function SessionHeaderCard({
             variant="outline"
             size="sm"
             onClick={onRequestReset}
-            className="gap-1.5 border-red-500/30 text-red-700 hover:bg-red-500/10 hover:text-red-700"
+            className="gap-1.5 border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
           >
             <RotateCw className="w-4 h-4" />
             <span className="hidden sm:inline">Reset</span>

@@ -17,10 +17,11 @@ import { formatDaysAgo } from "@/lib/format";
 import type { ExperienceLevel, Job, JobType } from "@/data/jobs";
 
 const EXPERIENCE_STYLES: Record<ExperienceLevel, string> = {
-  entry: "bg-green-100 text-green-800",
-  mid: "bg-blue-100 text-blue-800",
-  senior: "bg-purple-100 text-purple-800",
-  lead: "bg-orange-100 text-orange-800",
+  entry: "bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300",
+  mid: "bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300",
+  senior:
+    "bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300",
+  lead: "bg-orange-100 dark:bg-orange-950/50 text-orange-800 dark:text-orange-300",
 };
 
 const TYPE_ICONS: Record<JobType, typeof Briefcase> = {
@@ -46,7 +47,7 @@ export default function JobCard({
   const TypeIcon = TYPE_ICONS[job.type];
 
   return (
-    <Card className="h-full hover:border-slate-300 transition-shadow">
+    <Card className="h-full hover:border-input transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -64,7 +65,7 @@ export default function JobCard({
               {job.matchScore && (
                 <Badge
                   variant="secondary"
-                  className="bg-green-100 text-green-800"
+                  className="bg-green-100 dark:bg-green-950/50 text-green-800 dark:text-green-300"
                 >
                   {job.matchScore}% sample match
                 </Badge>
@@ -78,7 +79,7 @@ export default function JobCard({
               <span>{job.location}</span>
             </div>
             {job.salary && (
-              <div className="flex items-center gap-2 text-sm text-green-600 font-medium mb-2">
+              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-300 font-medium mb-2">
                 <DollarSign className="h-4 w-4" />
                 <span>{job.salary}</span>
               </div>

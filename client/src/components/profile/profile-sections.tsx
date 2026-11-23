@@ -8,7 +8,7 @@ export function ProfileSummary() {
   const { user, profileName } = useAuth();
   return (
     <Card className="p-6 flex items-center gap-5">
-      <span className="h-16 w-16 rounded-full bg-blue-50 text-primary text-2xl font-medium flex items-center justify-center">
+      <span className="h-16 w-16 rounded-full bg-blue-50 dark:bg-blue-950/50 text-primary text-2xl font-medium flex items-center justify-center">
         {profileName.slice(0, 1).toUpperCase()}
       </span>
       <div>

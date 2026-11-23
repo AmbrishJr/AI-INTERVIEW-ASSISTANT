@@ -22,27 +22,32 @@ export const CATEGORY_META: Record<
   tech: {
     label: "Tech News",
     Icon: Rocket,
-    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+    className:
+      "bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-200 dark:border-blue-800/60",
   },
   hiring: {
     label: "Hiring",
     Icon: Briefcase,
-    className: "bg-green-500/10 text-green-600 border-green-200",
+    className:
+      "bg-green-500/10 text-green-600 dark:text-green-300 border-green-200 dark:border-green-800/60",
   },
   layoffs: {
     label: "Layoffs",
     Icon: AlertTriangle,
-    className: "bg-red-500/10 text-red-600 border-red-200",
+    className:
+      "bg-red-500/10 text-red-600 dark:text-red-300 border-red-200 dark:border-red-800/60",
   },
   projects: {
     label: "Projects",
     Icon: Users,
-    className: "bg-purple-500/10 text-purple-600 border-purple-200",
+    className:
+      "bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-200 dark:border-purple-800/60",
   },
   internships: {
     label: "Internships",
     Icon: GraduationCap,
-    className: "bg-yellow-500/10 text-yellow-600 border-yellow-200",
+    className:
+      "bg-yellow-500/10 text-yellow-600 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800/60",
   },
 };
 
@@ -92,7 +97,7 @@ export default function NewsCard({
   const { Icon } = category;
 
   return (
-    <Card className="h-full hover:border-slate-300 transition-shadow duration-300">
+    <Card className="h-full hover:border-input transition-shadow duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <Badge className={`${category.className} border`}>

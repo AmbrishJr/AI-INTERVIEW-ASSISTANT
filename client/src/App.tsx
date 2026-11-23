@@ -7,6 +7,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/auth-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 import AppLayout from "@/components/layout/app-layout";
 import RequireAuth from "@/components/layout/require-auth";
 import ErrorBoundary from "@/components/layout/error-boundary";
@@ -76,21 +77,23 @@ function Router() {
 
 export default function App() {
   return (
-    <WouterRouter hook={useGuardedLocation}>
-      <MotionConfig reducedMotion="user">
-        <AuthProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster />
-              <GlobalLoadingIndicator />
-              <ErrorBoundary>
-                <Router />
-              </ErrorBoundary>
-              <AIChatbot />
-            </TooltipProvider>
-          </QueryClientProvider>
-        </AuthProvider>
-      </MotionConfig>
-    </WouterRouter>
+    <ThemeProvider>
+      <WouterRouter hook={useGuardedLocation}>
+        <MotionConfig reducedMotion="user">
+          <AuthProvider>
+            <QueryClientProvider client={queryClient}>
+              <TooltipProvider>
+                <Toaster />
+                <GlobalLoadingIndicator />
+                <ErrorBoundary>
+                  <Router />
+                </ErrorBoundary>
+                <AIChatbot />
+              </TooltipProvider>
+            </QueryClientProvider>
+          </AuthProvider>
+        </MotionConfig>
+      </WouterRouter>
+    </ThemeProvider>
   );
 }

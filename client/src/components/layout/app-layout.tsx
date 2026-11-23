@@ -14,6 +14,7 @@ import {
   AudioLines,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeMenu } from "@/components/common/theme-menu";
 import {
   Dialog,
   DialogContent,
@@ -72,7 +73,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   href={path}
                   onClick={() => setOpen(false)}
                   aria-current={location === path ? "page" : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${location === path ? "bg-blue-50 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${location === path ? "bg-blue-50 dark:bg-blue-950/50 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                 >
                   <Icon size={18} />
                   {label}
@@ -95,7 +96,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               href="/profile"
               className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-muted"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-primary font-medium">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/50 text-primary font-medium">
                 {profileName.slice(0, 1).toUpperCase()}
               </span>
               <span className="min-w-0">
@@ -148,7 +149,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {navigation}
       </aside>
       <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-card px-5 sm:px-8">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -158,18 +159,23 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           >
             <Menu />
           </Button>
-          <span className="text-sm text-muted-foreground">
-            Workspace <span className="mx-3 text-border">/</span>
+          <span className="min-w-0 truncate text-sm text-muted-foreground">
+            <span className="hidden sm:inline">
+              Workspace <span className="mx-3 text-border">/</span>
+            </span>
             <span className="text-foreground font-medium">{current}</span>
           </span>
         </div>
-        <Link
-          href={isLoggedIn ? "/profile" : "/login"}
-          aria-label="Your account"
-          className="rounded-full border p-2 text-muted-foreground"
-        >
-          <UserRound size={18} />
-        </Link>
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+          <ThemeMenu />
+          <Link
+            href={isLoggedIn ? "/profile" : "/login"}
+            aria-label="Your account"
+            className="rounded-full border p-2 text-muted-foreground"
+          >
+            <UserRound size={18} />
+          </Link>
+        </div>
       </header>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="fixed left-0 top-0 translate-x-0 translate-y-0 h-dvh w-72 rounded-none flex flex-col overflow-y-auto px-5 py-8">
@@ -186,7 +192,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         className="mx-auto max-w-[1440px] px-4 py-7 pb-28 sm:px-8 lg:py-9 lg:pb-28"
       >
         {user && !dismissImport && hasLegacyData() && (
-          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm">
+          <div className="mb-6 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 p-4 text-sm">
             <p className="font-medium">
               Practice data from an earlier visit is on this browser.
             </p>

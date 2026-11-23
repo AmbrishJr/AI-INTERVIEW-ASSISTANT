@@ -105,7 +105,7 @@ export default function AIChatbot() {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`rounded-lg p-4 text-sm ${message.role === "user" ? "bg-blue-50 ml-6" : "bg-muted mr-6"}`}
+                className={`rounded-lg p-4 text-sm ${message.role === "user" ? "bg-blue-50 dark:bg-blue-950/50 ml-6" : "bg-muted mr-6"}`}
               >
                 <p className="text-xs font-medium text-muted-foreground mb-2">
                   {message.role === "user" ? "You" : "Coach"}
@@ -129,7 +129,7 @@ export default function AIChatbot() {
           {error && (
             <div
               role="alert"
-              className="bg-red-50 p-3 rounded-lg text-sm text-red-700"
+              className="bg-red-50 dark:bg-red-950/50 p-3 rounded-lg text-sm text-red-700 dark:text-red-300"
             >
               <p>{error}</p>
               <Button

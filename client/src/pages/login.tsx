@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useLocation } from "wouter";
 import { Eye, EyeOff, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeMenu } from "@/components/common/theme-menu";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
 export default function Login() {
@@ -36,7 +37,7 @@ export default function Login() {
   };
   return (
     <main className="min-h-screen grid lg:grid-cols-2 bg-card">
-      <section className="hidden lg:flex flex-col justify-between bg-slate-100 border-r p-14 xl:p-20">
+      <section className="hidden lg:flex flex-col justify-between bg-muted border-r p-14 xl:p-20">
         <Link href="/" className="text-xl font-semibold tracking-tight">
           aicoach<span className="text-primary">.</span>
         </Link>
@@ -70,12 +71,15 @@ export default function Login() {
       </section>
       <section className="flex flex-col justify-center px-6 py-12 sm:px-12">
         <div className="w-full max-w-sm mx-auto">
-          <Link
-            href="/"
-            className="text-sm text-muted-foreground hover:text-primary"
-          >
-            Back to AICoach
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              href="/"
+              className="text-sm text-muted-foreground hover:text-primary"
+            >
+              Back to AICoach
+            </Link>
+            <ThemeMenu />
+          </div>
           <h2 className="mt-10 text-3xl font-semibold">
             {creating ? "Create your account" : "Welcome back"}
           </h2>
@@ -133,7 +137,7 @@ export default function Login() {
             {error && (
               <p
                 role="alert"
-                className="rounded-lg bg-red-50 p-3 text-sm text-red-700"
+                className="rounded-lg bg-red-50 dark:bg-red-950/50 p-3 text-sm text-red-700 dark:text-red-300"
               >
                 {error}
               </p>

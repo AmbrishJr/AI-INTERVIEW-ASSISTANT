@@ -37,10 +37,13 @@ const PLAYBACK_SPEED = 4; // seconds of session per real second
 const SKIP_SECONDS = 10;
 
 const MOMENT_STYLES = {
-  positive: "bg-green-500/10 border-l-green-500 text-green-700",
-  suggestion: "bg-blue-500/10 border-l-blue-500 text-blue-700",
-  warning: "bg-yellow-500/10 border-l-yellow-500 text-yellow-700",
-  error: "bg-red-500/10 border-l-red-500 text-red-700",
+  positive:
+    "bg-green-500/10 border-l-green-500 text-green-700 dark:text-green-300",
+  suggestion:
+    "bg-blue-500/10 border-l-blue-500 text-blue-700 dark:text-blue-300",
+  warning:
+    "bg-yellow-500/10 border-l-yellow-500 text-yellow-700 dark:text-yellow-300",
+  error: "bg-red-500/10 border-l-red-500 text-red-700 dark:text-red-300",
 } as const;
 
 /** Groups per-second samples into chart points (% of each bucket spent speaking / facing the camera). */
@@ -136,9 +139,7 @@ export default function InterviewReplay({
       <DialogContent className="max-w-5xl max-h-[90dvh] flex flex-col gap-0 p-0 overflow-hidden [&>button]:hidden">
         <div className="p-6 border-b border-border bg-card flex items-start justify-between gap-4">
           <div>
-            <DialogTitle
-              className="text-2xl font-heading font-bold text-foreground"
-            >
+            <DialogTitle className="text-2xl font-heading font-bold text-foreground">
               Interview Replay
             </DialogTitle>
             <DialogDescription>
@@ -270,7 +271,7 @@ export default function InterviewReplay({
                       type="monotone"
                       dataKey="speaking"
                       name="Speaking"
-                      stroke="#10b981"
+                      stroke="hsl(var(--chart-2))"
                       strokeWidth={2}
                       dot={false}
                     />
@@ -278,7 +279,7 @@ export default function InterviewReplay({
                       type="monotone"
                       dataKey="eyeContact"
                       name="Facing camera"
-                      stroke="#3b82f6"
+                      stroke="hsl(var(--chart-1))"
                       strokeWidth={2}
                       dot={false}
                       connectNulls={false}
@@ -288,10 +289,10 @@ export default function InterviewReplay({
               </div>
               <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-0.5 bg-[#10b981]" /> Speaking
+                  <span className="w-3 h-0.5 bg-chart-2" /> Speaking
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-0.5 bg-[#3b82f6]" /> Facing camera
+                  <span className="w-3 h-0.5 bg-chart-1" /> Facing camera
                 </span>
               </div>
             </Card>

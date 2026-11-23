@@ -23,7 +23,9 @@ export default function Session() {
       onExit={() => setLocation("/")}
       settingsPanel={
         <PanelCard
-          icon={<Settings2 className="w-4 h-4 text-blue-700" />}
+          icon={
+            <Settings2 className="w-4 h-4 text-blue-700 dark:text-blue-300" />
+          }
           title="Interview Settings"
         >
           <DifficultySelector

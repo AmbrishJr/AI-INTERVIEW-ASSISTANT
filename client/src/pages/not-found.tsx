@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { ThemeMenu } from "@/components/common/theme-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Gauge, Home, Search } from "lucide-react";
@@ -52,11 +53,14 @@ export default function NotFound() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-2xl">
         <CardContent className="pt-6 pb-6">
+          <div className="mb-3 flex justify-end">
+            <ThemeMenu />
+          </div>
           <div className="grid gap-6 md:grid-cols-[240px_1fr] md:items-center">
-            <div className="relative h-44 w-full overflow-hidden rounded-xl border bg-white">
+            <div className="relative h-44 w-full overflow-hidden rounded-xl border bg-card">
               <motion.div
                 className="absolute inset-0"
                 initial={{ opacity: 0 }}
@@ -87,9 +91,9 @@ export default function NotFound() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.35 }}
               >
-                <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 shadow-sm">
+                <div className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 shadow-sm">
                   <Search className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     Lost?
                   </span>
                 </div>
@@ -98,10 +102,10 @@ export default function NotFound() {
 
             <div className="space-y-4">
               <div className="space-y-1">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-foreground">
                   Page Not Found
                 </h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   The page you’re looking for doesn’t exist or may have been
                   moved.
                 </p>
@@ -151,7 +155,7 @@ export default function NotFound() {
                 </div>
               </form>
 
-              <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 <Button
                   type="button"
                   variant={redirectEnabled ? "secondary" : "outline"}

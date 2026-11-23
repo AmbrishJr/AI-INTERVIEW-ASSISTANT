@@ -92,19 +92,23 @@ const INSIGHT_STYLES: Record<
 > = {
   trend: {
     Icon: TrendingUp,
-    className: "text-blue-700 bg-blue-50 border-blue-200",
+    className:
+      "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800/60",
   },
   anomaly: {
     Icon: AlertTriangle,
-    className: "text-orange-700 bg-orange-50 border-orange-200",
+    className:
+      "text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/50 border-orange-200 dark:border-orange-800/60",
   },
   achievement: {
     Icon: CheckCircle,
-    className: "text-green-700 bg-green-50 border-green-200",
+    className:
+      "text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800/60",
   },
   warning: {
     Icon: AlertTriangle,
-    className: "text-red-700 bg-red-50 border-red-200",
+    className:
+      "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800/60",
   },
 };
 
